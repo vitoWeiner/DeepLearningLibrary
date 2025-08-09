@@ -667,9 +667,9 @@ DeviceMatrix DeviceMatrix::Random(size_t rows, size_t cols, std::pair<float, flo
         throw std::invalid_argument("Rows and columns must be greater than 0 for random matrix.");
     }
 
-    if (rows < TILE_HEIGHT || cols < TILE_WIDTH) {
+    /*if (rows < TILE_HEIGHT || cols < TILE_WIDTH) {
         return DeviceMatrix(Matrix::Random(rows, cols, range));
-    }
+    }*/
 
     DeviceMatrix random_matrix(rows, cols);
 
