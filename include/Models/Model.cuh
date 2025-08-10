@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory> // for std::shared_ptr
 #include <initializer_list>
+#include "./MLP/Layer.cuh"
 
 namespace dl {
     
@@ -33,7 +34,7 @@ namespace dl {
 			}
         }*/
 
-        size_t outputSize() const override;
+
 
         size_t depth() const;
 
@@ -48,6 +49,10 @@ namespace dl {
         void clean() noexcept override;
         
         void print(const char* header = "\nModel analytics:") const;
+
+        size_t inputSize() const override;
+
+        size_t outputSize() const override;
         
         
 
@@ -55,6 +60,10 @@ namespace dl {
 
 
     std::unique_ptr<Model> operator+(std::unique_ptr<LearningUnit>&& left, std::unique_ptr<LearningUnit>&& right);
+
+    std::unique_ptr<Model> operator+(std::unique_ptr<Model>&& left, std::unique_ptr<MLP::Layer>&& right);
+
+    std::unique_ptr<Model> operator+(std::unique_ptr<MLP::Layer>&& left, std::unique_ptr<Model>&& right);
 
     /*std::unique_ptr<Model> operator+(const std::unique_ptr<LearningUnit>& left, const std::unique_ptr<LearningUnit>& right);
 	std::unique_ptr<Model> operator+(std::unique_ptr<LearningUnit>&& left, std::unique_ptr<LearningUnit>&& right);

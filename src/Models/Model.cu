@@ -1,4 +1,5 @@
 #include "../../include/Models/Model.cuh"
+#include "../../include/Models/MLP/Layer.cuh"
 #include <type_traits>
 
 namespace dl {
@@ -18,6 +19,28 @@ namespace dl {
         other.clean();
     
     }
+
+    size_t Model::inputSize() const {
+                
+        if (this->learning_units.empty()) {
+            return LearningUnit::inputSize();
+		}
+        else {
+            return learning_units.front()->inputSize();
+		}
+    }
+
+    size_t Model::outputSize() const {
+        
+        if (this->learning_units.empty()) {
+			return LearningUnit::outputSize();
+		}
+        else {
+            return learning_units.back()->outputSize();
+        }
+	}
+
+
 
 	void Model::bind(const std::unique_ptr<LearningUnit>& unit) {
 
@@ -39,6 +62,10 @@ namespace dl {
 		if (!unit) {
 			throw std::runtime_error("Cannot bind a null LearningUnit.");
 		}
+
+        size_t f = this->learning_units.size();
+        size_t s = (f == 0)? 0 : this->learning_units.back()->outputSize();
+		size_t t = unit->inputSize();
 
         if (this->learning_units.size() > 0 && this->learning_units.back()->outputSize() != unit->inputSize()) {
             throw std::runtime_error("Input size of the new LearningUnit does not match the output size of the last LearningUnit in the model.");
@@ -77,17 +104,7 @@ namespace dl {
         learning_units.clear();
     }
 
-    size_t Model::outputSize() const {
-        
-        if (this->learning_units.empty()) {
-          
-            return inputSize();
-        }
-
-		
-		return learning_units.back()->outputSize();
-
-    }
+    
     
     size_t Model::depth() const {
 
@@ -112,7 +129,7 @@ namespace dl {
     }
 
 
-    void Model::print(const char* header = "\nLearningUnit analytics:") const {
+    void Model::print(const char* header) const {
         printf("\nModel analytics:\n");
         printf("\n__________\n");
         printf("Number of LearningUnits: %zu\n", learning_units.size());
@@ -128,6 +145,25 @@ namespace dl {
 
 
 	// OPERATOR OVERLOADS FOR MODEL COMPOSITION
+
+    std::unique_ptr<Model> operator+(std::unique_ptr<MLP::Layer>&& left, std::unique_ptr<Model>&& right) {
+        if (!left || !right) {
+            throw std::runtime_error("Cannot add null LearningUnits.");
+        }
+
+        right->bind(std::move(left));
+
+		return std::make_unique<Model>(std::move(*right));
+    }
+
+    std::unique_ptr<Model> operator+(std::unique_ptr<Model>&& left, std::unique_ptr<MLP::Layer>&& right) {
+        if (!left || !right) {
+            throw std::runtime_error("Cannot add null LearningUnits.");
+        }
+        left->bind(std::move(right));
+    
+		return std::make_unique<Model>(std::move(*left));
+    }
 
     std::unique_ptr<Model> operator+(std::unique_ptr<LearningUnit>&& left, std::unique_ptr<LearningUnit>&& right) {
         if (!left || !right) {

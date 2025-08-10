@@ -35,16 +35,16 @@ int main()
 
 	
 
-	std::unique_ptr<Model> model = std::make_unique<MLP::Layer>(layer) 
-		                         + std::make_unique<MLP::Layer>(layer) 
-		                         + std::make_unique<MLP::Layer>(MLP::Layer::RandomLayer(20, 5));
+	std::unique_ptr<Model> model = std::make_unique<MLP::Layer>(MLP::Layer::RandomLayer(20, 20)) 
+		                         + std::make_unique<MLP::Layer>(MLP::Layer::RandomLayer(20, 20)) 
+		                         + std::make_unique<MLP::Layer>(MLP::Layer::RandomLayer(20, 20));
 	
-	std::unique_ptr<Model> model2 = model->clone() + std::make_unique<MLP::Layer>(MLP::Layer::RandomLayer(5, 1));
+	std::unique_ptr<Model> model2 = model->clone() + model->clone();
 
 
-	model->setInput(DeviceMatrix::Random(20, 1, { -10.0f, 1.0f }));
+	
 
-	printf("%zu", model->depth());
+	printf("%zu", model2->depth());
 
     return 0;
 }
