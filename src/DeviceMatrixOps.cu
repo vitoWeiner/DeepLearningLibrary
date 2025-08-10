@@ -29,6 +29,7 @@ NPR:
 #define TILE_HEIGHT 16
 
 
+namespace dl {
 
 __global__ void tiled_matmul(float* res, float* X, float* Y, int rowsX, int colsX, int colsY) {
 
@@ -964,3 +965,5 @@ DeviceMatrix DeviceMatrix::MSEGradient(const DeviceMatrix& output, const DeviceM
 
     return gradient;
 }
+
+};

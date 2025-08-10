@@ -80,12 +80,17 @@
     <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="src\DeviceMatrix.cu" />
     <CudaCompile Include="src\DeviceMatrixOps.cu" />
+    <CudaCompile Include="src\Models\Activations\Sigmoid.cu" />
     <CudaCompile Include="src\Models\MLP\Layer.cu" />
+    <CudaCompile Include="src\Models\Model.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DeviceMatrix.cuh" />
     <ClInclude Include="include\Matrix.hpp" />
+    <ClInclude Include="include\Models\Activations\Sigmoid.cuh" />
+    <ClInclude Include="include\Models\LearningUnit.cuh" />
     <ClInclude Include="include\Models\MLP\Layer.cuh" />
+    <ClInclude Include="include\Models\Model.cuh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Matrix.cpp" />

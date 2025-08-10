@@ -7,6 +7,10 @@
 #include <fstream>      // std::ofstream
 #include <cmath>        // std::fabs
 
+
+namespace dl {
+
+
 Matrix::Matrix() : rows_count(0), cols_count(0), total_size(0), matrix(nullptr) {}
 
 Matrix::Matrix(float* args, size_t rows, size_t cols)
@@ -112,10 +116,10 @@ Matrix::Matrix(Matrix&& other) noexcept
     : rows_count(other.rows_count), cols_count(other.cols_count),
     total_size(other.total_size), matrix(other.matrix) {
 
-    other.matrix = nullptr;
-    other.total_size = 0;
-    other.rows_count = 0;
-    other.cols_count = 0;
+   other.matrix = nullptr;
+   other.total_size = 0;
+   other.rows_count = 0;
+   other.cols_count = 0;
 }
 
 
@@ -603,10 +607,12 @@ void Matrix::clean() noexcept {
         delete[] this->matrix;
         this->matrix = nullptr;
 
-    this->rows_count = 0;
-    this->cols_count = 0;
-    this->total_size = 0;
+        this->rows_count = 0;
+        this->cols_count = 0;
+        this->total_size = 0;
 
     }
 
 }
+
+};

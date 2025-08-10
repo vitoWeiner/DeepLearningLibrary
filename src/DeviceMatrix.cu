@@ -7,6 +7,10 @@
 #include <algorithm>  
 #include <initializer_list>
 
+namespace dl {
+
+
+
 DeviceMatrix::DeviceMatrix() :
     device_matrix(nullptr), rows_count(0), cols_count(0), total_size(0) {
 }
@@ -173,7 +177,7 @@ DeviceMatrix::DeviceMatrix(DeviceMatrix&& other) noexcept
     total_size(other.total_size)
 {
 
-
+    
 
     //std::cout << "[Move ctor]" << std::endl;
     other.device_matrix = nullptr;
@@ -297,3 +301,4 @@ DeviceMatrix::~DeviceMatrix() {
     }
 }
 
+};
