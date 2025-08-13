@@ -10,13 +10,19 @@
 namespace dl {
 
 
+long long DeviceMatrix::instances = 0;
+long long DeviceMatrix::ID = 0;
+
+std::unordered_set<long long> DeviceMatrix::ids;
+
 
 DeviceMatrix::DeviceMatrix() :
-    device_matrix(nullptr), rows_count(0), cols_count(0), total_size(0) {
+    device_matrix(nullptr), rows_count(0), cols_count(0), total_size(0), id(-10) {
+	//DeviceMatrix::increment();
 }
 
 DeviceMatrix::DeviceMatrix(const DeviceMatrix& other) :
-    device_matrix(nullptr), rows_count(other.rows_count), cols_count(other.cols_count), total_size(other.total_size) {
+    device_matrix(nullptr), rows_count(other.rows_count), cols_count(other.cols_count), total_size(other.total_size), id(-20) {
 
     if (other.device_matrix == nullptr) {
         return;
@@ -37,6 +43,8 @@ DeviceMatrix::DeviceMatrix(const DeviceMatrix& other) :
         cudaFree(this->device_matrix);
         throw std::runtime_error("DeviceMatrix copy constructor error:\n cudaMemcpy failed: " + std::string(cudaGetErrorString(cuda_memcpy_error)));
     }
+
+    DeviceMatrix::increment(this);
 }
 
 DeviceMatrix& DeviceMatrix::operator=(const DeviceMatrix& other)
@@ -51,6 +59,8 @@ DeviceMatrix& DeviceMatrix::operator=(const DeviceMatrix& other)
             //throw std::runtime_error("DeviceMatrix assignment error: cudaFree failed: " + std::string(cudaGetErrorString(err)));
             printf("[DeviceMatrix] Warning: cudaFree failed in assignment: %s\n", cudaGetErrorString(err));
         }
+		this->device_matrix = nullptr;
+		DeviceMatrix::decrement(this->id);
     }
 
     this->rows_count = other.rows_count;
@@ -77,13 +87,15 @@ DeviceMatrix& DeviceMatrix::operator=(const DeviceMatrix& other)
         throw std::runtime_error("DeviceMatrix assignment error:\n cudaMemcpy failed: " + std::string(cudaGetErrorString(cuda_memcpy_error)));
     }
 
+    DeviceMatrix::increment(this);
+
     return *this;
 }
 
-DeviceMatrix::DeviceMatrix(const Matrix& mat) :
-    device_matrix(nullptr), rows_count(mat.rows()), cols_count(mat.cols()), total_size(mat.totalSize()) {
+DeviceMatrix::DeviceMatrix(const Matrix& other) :
+    device_matrix(nullptr), rows_count(other.rows()), cols_count(other.cols()), total_size(other.totalSize()) {
 
-    const float* temp_arr = mat.borrowData();
+    const float* temp_arr = other.borrowData();
 
     if (temp_arr == nullptr) {
         return;
@@ -104,6 +116,8 @@ DeviceMatrix::DeviceMatrix(const Matrix& mat) :
         cudaFree(device_matrix);
         throw std::runtime_error("error in CUDA_Matrix.uploadFromMatrix(Matrix M): problem:\n cudaMemcpy failed:\n" + std::string(cudaGetErrorString(cuda_memcpy_error)));
     }
+
+    DeviceMatrix::increment(this);
 }
 
 DeviceMatrix::DeviceMatrix(std::initializer_list<float> args, size_t rows, size_t cols) :
@@ -140,6 +154,7 @@ DeviceMatrix::DeviceMatrix(std::initializer_list<float> args, size_t rows, size_
         throw std::runtime_error("DeviceMatrix constructor error:\n cudaMemcpy failed: " + std::string(cudaGetErrorString(cuda_memcpy_error)));
     }
 
+	DeviceMatrix::increment(this);
 }
 
 
@@ -166,6 +181,8 @@ DeviceMatrix::DeviceMatrix(size_t rows, size_t cols) :
         cudaFree(this->device_matrix);
         throw std::runtime_error("DeviceMatrix constructor error:\n cudaMemset failed: " + std::string(cudaGetErrorString(cuda_memset_error)));
     }
+
+	DeviceMatrix::increment(this);
 }
 
 //#include <iostream>
@@ -174,7 +191,8 @@ DeviceMatrix::DeviceMatrix(DeviceMatrix&& other) noexcept
     : device_matrix(other.device_matrix),
     rows_count(other.rows_count),
     cols_count(other.cols_count),
-    total_size(other.total_size)
+    total_size(other.total_size),
+	id(other.id)  // Move the id as well
 {
 
     //std::cout << "[Move ctor]" << std::endl;
@@ -196,6 +214,7 @@ DeviceMatrix& DeviceMatrix::operator=(DeviceMatrix&& other) noexcept { // error 
 
     if (this->device_matrix) {
         cudaError_t err = cudaFree(this->device_matrix);
+        DeviceMatrix::decrement(this->id);
 
         if (err != cudaSuccess) {
             //std::cerr << "[DeviceMatrix] Warning: cudaFree failed in move assignment: "
@@ -207,6 +226,7 @@ DeviceMatrix& DeviceMatrix::operator=(DeviceMatrix&& other) noexcept { // error 
     this->rows_count = other.rows_count;
     this->cols_count = other.cols_count;
     this->total_size = other.total_size;
+	this->id = other.id;  // Move the id as well
 
     other.device_matrix = nullptr;
     other.rows_count = 0;
@@ -290,12 +310,15 @@ void DeviceMatrix::clean() noexcept {
         this->rows_count = 0;
         this->cols_count = 0;
         this->total_size = 0;
+	    DeviceMatrix::decrement(this->id);
     }
+
 }
 
 DeviceMatrix::~DeviceMatrix() {
     if (device_matrix != nullptr) {
         cudaFree(device_matrix);
+		DeviceMatrix::decrement(this->id);
     }
 }
 

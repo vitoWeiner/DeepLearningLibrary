@@ -163,7 +163,7 @@ namespace dl {
         	DeviceMatrix Weights = DeviceMatrix::Random(output_size, input_size, range);
         	DeviceMatrix Biases = DeviceMatrix::Random(output_size, 1, range);
         
-        	return Layer(Weights, Biases);
+        	return Layer(std::move(Weights), std::move(Biases));
         }
 
         void Layer::print(const char* header) const {

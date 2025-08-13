@@ -36,95 +36,61 @@ svi ostalo konstruktori u pravilu rade deep copy
 #include <iostream>
 
 
+void f() {
+
+	{
+
+
+		Model model({
+			std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 4)),
+			std::make_shared<ReLU>(),
+			std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(4, 6)),
+			std::make_shared<ReLU>(),
+			std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(6, 4)),
+			std::make_shared<Sigmoid>(),
+			std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(4, 1)),
+			std::make_shared<Sigmoid>()
+			});
+
+
+		std::shared_ptr<TrainingData> data = std::make_shared<TrainingData>();
+
+		for (float i = 0; i < 0.5f; i += 0.1f) {
+			for (float j = 0; j < 0.5f; j += 0.1f) {
+
+				data->add({ i, j }, { i + j });
+			}
+		}
+
+		model.setTrainingData(data);
+		model.setCostFunction(std::make_shared<MSE>());
+
+
+		model.trainSingleBatchGD(10000, 0.5);
+
+		model.evaluate();
+
+
+		std::cout << "first time : " << DeviceMatrix::instances << std::endl;
+
+
+
+	}
+
+
+}
+
 
 int main()
 {
-	
-
-	/*Model model({
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(5, 20)),
-		std::make_shared<Sigmoid>(),
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(20, 20)),
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(20, 70)),
-		std::make_shared<Sigmoid>(),
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(70, 1))
-		});
-
-
-	model.print();
-	*/
 
 	
-
-
-
-	Model xorModel({
-	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 2)), // bias obavezno
-	std::make_shared<Sigmoid>(),
-	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 1)),
-	std::make_shared<Sigmoid>() // za izlaz + BCE loss
-		});
-
-
-
-	std::shared_ptr<TrainingData> data = std::make_shared<TrainingData>();
-
-	data->add({ 1, 0 }, { 1 });
-	data->add({ 0, 1 }, { 1 });
-	data->add({ 0, 0 }, { 0 });
-	data->add({ 1, 1 }, { 0 });
-
-	xorModel.setTrainingData(data);
-	xorModel.setCostFunction(std::make_shared<BCE>());
-
-//	model.print();
-
-	xorModel.trainSingleBatchGD(5000, 0.05f);
-
-	xorModel.evaluate();
-
 	
-
-	
-
-	//model->setInput(DeviceMatrix::Random(5, 1));
-
-	//model->forward();
+	f();
+	std::cout << "second time : " << DeviceMatrix::instances << std::endl;
 
 
 
-	// make_model(LearningUnits);
-	// Model += {Unit, Unit, Unit}
-	// combine_models(Model&& x, Model&& y);
-
-
-	
-		                            
-
-
-
-	/*
-
-	MLP::Layer layer = MLP::Layer::RandomLayer(20, 20);
-	
-
-	layer.setInput(DeviceMatrix::Random(20, 1, { -10.0f, 1.0f }));
-
-	MLP::Layer layer2(DeviceMatrix::Random(20, 20), DeviceMatrix::Random(20, 1));
-	
-	layer2.setInput(layer.forward());
-
-	
-
-	std::shared_ptr<Model> model;
-	
-	std::shared_ptr<Model> model2 =  model->clone() + model->clone();
-
-
-	*/
-	
-
-	//printf("%zu", model2->depth());
 
     return 0;
 }

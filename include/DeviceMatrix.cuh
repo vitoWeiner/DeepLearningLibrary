@@ -4,7 +4,8 @@
 #include "Matrix.hpp"
 #include <initializer_list>
 #include <functional>
-
+#include <stdexcept> // for std::runtime_error
+#include <unordered_set>
 
 namespace dl {
 
@@ -15,8 +16,30 @@ namespace dl {
         size_t rows_count;
         size_t cols_count;
         size_t total_size;
-    
+        
     public:
+        static long long instances;
+        static std::unordered_set<long long> ids;
+     
+		static long long ID;
+		long long id;  
+
+        static void increment(DeviceMatrix* edit) {
+            if (DeviceMatrix::instances >= 10000)
+				throw std::runtime_error("DeviceMatrix instances limit reached. Possible memory leak or incorrect usage.");
+			DeviceMatrix::instances++;
+			edit->id = ID;
+            ids.insert(ID);
+            ID++;
+        }
+
+        static void decrement(int id_m) {
+            if (DeviceMatrix::instances == 0)
+                printf("shit happend");
+			DeviceMatrix::instances--;
+            ids.erase(id_m);
+        }
+
         //DeviceMatrix(const DeviceMatrix&) = delete;
         //DeviceMatrix& operator=(const DeviceMatrix&) = delete;
         DeviceMatrix();
@@ -74,4 +97,6 @@ namespace dl {
         ~DeviceMatrix();
 
 	}; // class DeviceMatrix
+
+   
 };  // namespace dl

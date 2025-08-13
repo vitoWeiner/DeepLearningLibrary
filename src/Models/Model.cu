@@ -204,13 +204,16 @@ namespace dl {
 
 		this->setInput(std::move(batch.first));
 
+
         for (size_t epoch = 0; epoch < epochs; ++epoch) {
 
             DeviceMatrix output = this->forward();
+            
+
 
 
             if (epoch % 10 == 0)
-			    this->cost_function->compute(output, target_matrix).downloadToHost().print();
+			   this->cost_function->compute(output, target_matrix).downloadToHost().print();
 
 			DeviceMatrix gradient_output = this->cost_function->gradient(output, target_matrix);
 
