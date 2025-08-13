@@ -66,6 +66,10 @@ namespace dl {
         // costs
         static DeviceMatrix MSE(const DeviceMatrix& output, const DeviceMatrix& target);  // ovo nije bitno dal radi dobro ili ne jer se ne koristi direktno za treniranje vec cisto kao pokazatelj
         static DeviceMatrix MSEGradient(const DeviceMatrix& output, const DeviceMatrix& target);  // works fine
+
+
+       static DeviceMatrix BCEGradient(const DeviceMatrix& output, const DeviceMatrix& target);
+       static DeviceMatrix DeviceMatrix::BCE(const DeviceMatrix& output, const DeviceMatrix& target);
     
         ~DeviceMatrix();
 

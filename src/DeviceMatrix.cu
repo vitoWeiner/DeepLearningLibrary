@@ -177,8 +177,6 @@ DeviceMatrix::DeviceMatrix(DeviceMatrix&& other) noexcept
     total_size(other.total_size)
 {
 
-    
-
     //std::cout << "[Move ctor]" << std::endl;
     other.device_matrix = nullptr;
     other.rows_count = 0;

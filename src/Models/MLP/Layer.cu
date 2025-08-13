@@ -37,17 +37,17 @@ namespace dl {
         	//this->output_size = this->weights.rows();
         }
         
-        Layer::Layer(const Layer& layer) :
+        /*Layer::Layer(const Layer& layer) :
         	weights(layer.weights),
         	biases(layer.biases),
         	input(layer.input)
-            {}
+            {}*/
         	//input_size(layer.input_size),
         	//output_size(layer.output_size) 
         
         
         
-        Layer& Layer::operator=(const Layer& layer) {
+        /*Layer& Layer::operator=(const Layer& layer) {
         	if (this == &layer) {
         		return *this;
         	}
@@ -56,7 +56,7 @@ namespace dl {
         	//this->input_size = layer.input_size;
         	//this->output_size = layer.output_size;
         	return *this;
-        }
+        }*/
         
         
         void Layer::setInput(const DeviceMatrix& input_matrix) {
@@ -75,19 +75,19 @@ namespace dl {
         }
         
         
-        Layer::Layer(Layer&& layer) noexcept :
+        /*Layer::Layer(Layer&& layer) noexcept :
         	weights(std::move(layer.weights)),
         	biases(std::move(layer.biases)),
         	input(std::move(layer.input))
         {
         	//layer.input_size = 0;
         	//layer.output_size = 0;
-        }
+        }*/
         	//input_size(layer.input_size),
         	//output_size(layer.output_size) 
         
         
-        Layer& Layer::operator=(Layer&& layer) noexcept {
+       /* Layer& Layer::operator=(Layer&& layer) noexcept {
         	if (this == &layer) {
         		return *this;
         	}
@@ -99,7 +99,7 @@ namespace dl {
         	//layer.input_size = 0;
         	//layer.output_size = 0;
         	return *this;
-        }
+        }*/
         
         
         DeviceMatrix Layer::forward() {
@@ -117,14 +117,14 @@ namespace dl {
         
         }
         
-        DeviceMatrix Layer::backpropagate(const DeviceMatrix& nablaC) {  // backpropagation only, no training step
+        DeviceMatrix Layer::backpropagate(DeviceMatrix nablaC) {  // backpropagation only, no training step
         	if (nablaC.rows() != this->outputSize())
         		throw std::runtime_error("Gradient output must have the same number of rows as the layer's output size");
         
         	return DeviceMatrix::matMul(DeviceMatrix::matTranspose(this->weights), nablaC);
         }
         
-        DeviceMatrix Layer::train(const DeviceMatrix& gradient_output, float learning_rate) {  // backpropagation + training step
+        DeviceMatrix Layer::updateParamsAndBackpropagate(DeviceMatrix gradient_output, float learning_rate) {  // backpropagation + training step
         
         	if (gradient_output.rows() != this->outputSize())
         		throw std::runtime_error("Gradient output must have the same number of rows as the layer's output size");
@@ -153,8 +153,6 @@ namespace dl {
         	//this->input_size = 0;
         	//this->output_size = 0;
         }
-
-        
         
 
         Layer Layer::RandomLayer(size_t input_size, size_t output_size, std::pair<float, float> range) {
@@ -176,8 +174,11 @@ namespace dl {
             printf("%s\n__________\n", header);
 			printf("input size: %zu\n", this->inputSize());
 			printf("output size: %zu\n", this->outputSize());
+			printf("parameter count: %zu\n", this->parameterCount());
             printf("\n__________\n");
+            
             printf("Weights:\n\n");
+
             weights_host.print(10, 10);
             
 
@@ -186,8 +187,8 @@ namespace dl {
 			printf("\n__________\n\n");
 		}
 
-        std::unique_ptr<LearningUnit> Layer::clone() const {
-            return std::make_unique<Layer>(*this);
+        std::shared_ptr<LearningUnit> Layer::clone() const {
+            return std::make_shared<Layer>(*this);
         }
         
 	}; // namespace MLP      

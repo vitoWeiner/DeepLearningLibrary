@@ -77,20 +77,27 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="include\Models\CostFunctions\CostFunction.cuh" />
     <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="src\DeviceMatrix.cu" />
     <CudaCompile Include="src\DeviceMatrixOps.cu" />
+    <CudaCompile Include="src\Models\Activations\ReLU.cu" />
     <CudaCompile Include="src\Models\Activations\Sigmoid.cu" />
     <CudaCompile Include="src\Models\MLP\Layer.cu" />
     <CudaCompile Include="src\Models\Model.cu" />
+    <CudaCompile Include="src\Models\TrainingData\MLP_TrainingData.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DeviceMatrix.cuh" />
     <ClInclude Include="include\Matrix.hpp" />
+    <ClInclude Include="include\Models\Activations\ReLU.cuh" />
     <ClInclude Include="include\Models\Activations\Sigmoid.cuh" />
+    <ClInclude Include="include\Models\CostFunctions\BCE.cuh" />
+    <ClInclude Include="include\Models\CostFunctions\MSE.cuh" />
     <ClInclude Include="include\Models\LearningUnit.cuh" />
     <ClInclude Include="include\Models\MLP\Layer.cuh" />
     <ClInclude Include="include\Models\Model.cuh" />
+    <ClInclude Include="include\Models\TrainingData\MLP_TrainingData.cuh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Matrix.cpp" />

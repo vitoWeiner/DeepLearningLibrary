@@ -260,7 +260,7 @@ void Matrix::print(size_t rows, size_t cols) const noexcept {
 
     for (size_t row = 0; row < rows; ++row) {
         for (size_t col = 0; col < cols; ++col) {
-            printf("%.2f ", this->matrix[row * cols_count + col]);
+            printf("%.4f ", this->matrix[row * cols_count + col]);
         }
         printf("\n");
     }

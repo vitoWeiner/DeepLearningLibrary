@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdexcept> // for std::runtime_error
-#include <memory>   // for std::unique_ptr
+#include <memory>   // for std::shared_ptr
 
 #include "../DeviceMatrix.cuh"
 
@@ -29,7 +29,12 @@ Model ::= LearningUnit+
 
 		LearningUnit() = default;
 
-		LearningUnit(const LearningUnit& other) : input(other.input) {}
+		LearningUnit(const LearningUnit& other) = default;
+		LearningUnit& operator=(const LearningUnit& other) = default;
+		LearningUnit(LearningUnit&& other) noexcept = default;
+		LearningUnit& operator=(LearningUnit&& other) noexcept = default;
+
+//		LearningUnit(const LearningUnit& other) : input(other.input) {}
 		
 
 		virtual void setInput(const DeviceMatrix& input_matrix) {
@@ -58,12 +63,12 @@ Model ::= LearningUnit+
 			return this->input;
 		}
 
-		virtual DeviceMatrix backpropagate(const DeviceMatrix& gradient_output) {
+		virtual DeviceMatrix backpropagate(DeviceMatrix gradient_output) {
 			
 			return gradient_output;
 		}
 
-		virtual  DeviceMatrix train(const DeviceMatrix& gradient_output, float learning_rate = 0.01f) {
+		virtual  DeviceMatrix updateParamsAndBackpropagate(DeviceMatrix gradient_output, float learning_rate = 0.01f) {
 			
 			return gradient_output;
 		}
@@ -76,9 +81,19 @@ Model ::= LearningUnit+
 			return input.rows();
 		}
 
-		virtual std::unique_ptr<LearningUnit> clone() const {
-			return std::make_unique<LearningUnit>(*this);
+		virtual size_t parameterCount() const {
+			return 0; 
 		}
+
+		virtual bool has_variable_input() const {
+			return true; 
+		}
+
+		virtual std::shared_ptr<LearningUnit> clone() const {
+			return std::make_shared<LearningUnit>(*this);
+		}
+
+		
 
 		virtual void clean() noexcept {
 			this->input.clean();
@@ -94,5 +109,7 @@ Model ::= LearningUnit+
 	
 	}; // class LearningUnit
 
+
+	
 
 }; // namespace dl

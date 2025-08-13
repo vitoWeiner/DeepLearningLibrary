@@ -966,4 +966,100 @@ DeviceMatrix DeviceMatrix::MSEGradient(const DeviceMatrix& output, const DeviceM
     return gradient;
 }
 
+__global__ void BCE_gradient_kernel(float* gradient, const float* output, const float* target, size_t rows, size_t cols) {
+    int row = blockDim.y * blockIdx.y + threadIdx.y;
+    int col = blockDim.x * blockIdx.x + threadIdx.x;
+    if (row >= rows || col >= cols)
+        return;
+
+    int idx = row * cols + col;
+
+    float y_hat = output[idx];
+    float y = target[idx];
+
+    // epsilon da izbjegnemo log(0) i dijeljenje s 0
+    const float eps = 1e-8f;
+    gradient[idx] = (y_hat - y) / (max(y_hat * (1.0f - y_hat), eps));
+}
+
+DeviceMatrix DeviceMatrix::BCEGradient(const DeviceMatrix& output, const DeviceMatrix& target) {
+    if (output.totalSize() == 0 || target.totalSize() == 0)
+        throw std::runtime_error("BCE gradient: matrices empty");
+
+    if (output.rows() != target.rows() || output.cols() != target.cols())
+        throw std::runtime_error("BCE gradient: size mismatch");
+
+    DeviceMatrix gradient(output.rows(), output.cols());
+
+    dim3 blockSize(TILE_WIDTH, TILE_HEIGHT);
+    dim3 gridSize((output.cols() + TILE_WIDTH - 1) / TILE_WIDTH,
+        (output.rows() + TILE_HEIGHT - 1) / TILE_HEIGHT);
+
+    BCE_gradient_kernel << <gridSize, blockSize >> > (
+        gradient.device_matrix, output.device_matrix, target.device_matrix,
+        output.rows(), output.cols()
+        );
+
+    cudaDeviceSynchronize();
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess)
+        throw std::runtime_error("BCE gradient kernel error: " + std::string(cudaGetErrorString(err)));
+
+    return gradient;
+}
+
+__global__ void BCE_kernel(const float* output, const float* target, float* result, size_t rows, size_t cols) {
+    int row = blockDim.y * blockIdx.y + threadIdx.y;
+    int col = blockDim.x * blockIdx.x + threadIdx.x;
+    if (row >= rows || col >= cols) return;
+
+    int idx = row * cols + col;
+    const float eps = 1e-8f; // stabilnost loga
+    float y_hat = output[idx];
+    float y = target[idx];
+
+    result[idx] = -(y * logf(fmaxf(y_hat, eps)) + (1.0f - y) * logf(fmaxf(1.0f - y_hat, eps)));
+}
+
+DeviceMatrix DeviceMatrix::BCE(const DeviceMatrix& output, const DeviceMatrix& target) {
+    if (output.totalSize() == 0 || target.totalSize() == 0)
+        throw std::runtime_error("BCE: matrices empty");
+
+    if (output.rows() != target.rows() || output.cols() != target.cols())
+        throw std::runtime_error("BCE: size mismatch");
+
+
+    DeviceMatrix bce_values(output.rows(), output.cols());
+
+    dim3 blockSize(TILE_WIDTH, TILE_HEIGHT);
+    dim3 gridSize((output.cols() + TILE_WIDTH - 1) / TILE_WIDTH,
+        (output.rows() + TILE_HEIGHT - 1) / TILE_HEIGHT);
+
+    BCE_kernel << <gridSize, blockSize >> > (
+        output.device_matrix,
+        target.device_matrix,
+        bce_values.device_matrix,
+        output.rows(), output.cols()
+        );
+
+    cudaDeviceSynchronize();
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess)
+        throw std::runtime_error("BCE kernel error: " + std::string(cudaGetErrorString(err)));
+
+ 
+    DeviceMatrix row_sum = DeviceMatrix::matRowReduce(bce_values);
+    DeviceMatrix total_sum = DeviceMatrix::matColReduce(row_sum); 
+
+
+    float scale = 1.0f / static_cast<float>(output.totalSize());
+    DeviceMatrix mean_bce = DeviceMatrix::matScale(total_sum, scale);
+
+    return mean_bce; 
+}
+
+
+
+
+
 };
