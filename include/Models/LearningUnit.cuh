@@ -49,9 +49,9 @@ Model ::= LearningUnit+
 
 		virtual void setInput(DeviceMatrix&& input_matrix) {
 
-			if (input_matrix.totalSize() == 0) {
+			/*if (input_matrix.totalSize() == 0) {
 				throw std::runtime_error("Input matrix cannot be empty.");
-			}
+			}*/
 
 
 			input = std::move(input_matrix);
@@ -85,8 +85,12 @@ Model ::= LearningUnit+
 			return 0; 
 		}
 
-		virtual bool has_variable_input() const {
+		virtual bool has_variable_input() const {  // does it works for any input or just for static size inputs? for example layers must have defined input size and output size, sigmoid not
 			return true; 
+		}
+
+		virtual bool backpropNeedsInput() const { // can we do backpropagation on this unit, only if input is set (not a null-pointer)?    
+			return true;
 		}
 
 		virtual std::shared_ptr<LearningUnit> clone() const {

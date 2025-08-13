@@ -53,6 +53,7 @@ namespace dl {
             void print(const char* header = "\nMLP::Layer analytics:") const;
 
 			bool has_variable_input() const override { return false; }  // is input size fixed of variable for layer, if its fixed, it need to be set before training
+            bool backpropNeedsInput() const override { return true;  }  // backpropagating layer needs information about input to layer
 
             std::shared_ptr<LearningUnit> clone() const override;
 

@@ -77,6 +77,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="externiCFileoviZaTest.cu" />
     <CudaCompile Include="include\Models\CostFunctions\CostFunction.cuh" />
     <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="src\DeviceMatrix.cu" />
@@ -100,6 +101,7 @@
     <ClInclude Include="include\Models\TrainingData\MLP_TrainingData.cuh" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Matrix.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

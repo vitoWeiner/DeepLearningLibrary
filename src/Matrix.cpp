@@ -217,6 +217,17 @@ float Matrix::getAt(size_t row, size_t col) const {
     return this->matrix[global_idx];
 }
 
+bool Matrix::check(const std::function<bool(float)>& predicate) {
+    for (size_t row = 0; row < this->rows(); ++row) {
+        for (size_t col = 0; col < this->cols(); ++col) {
+            if (!predicate(this->getAt(row, col)))
+                return false;
+        }
+    }
+
+    return true;
+}
+
 Matrix Matrix::elementWiseMultiply(const Matrix& a, const Matrix& b) {
     if (a.rows() != b.rows() || a.cols() != b.cols()) {
         throw std::invalid_argument("Matrix elementWiseMultiply error: incompatible dimensions");

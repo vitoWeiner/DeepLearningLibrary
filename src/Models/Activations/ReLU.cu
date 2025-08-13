@@ -33,9 +33,9 @@ namespace dl {
 
 	DeviceMatrix ReLU::backpropagate(DeviceMatrix gradient_output) {
 
-		if (this->input.totalSize() == 0) {
+		/*if (this->input.totalSize() == 0) {
 			throw std::runtime_error("Input matrix is empty");
-		}
+		}*/
 
 		if (this->output.totalSize() == 0) {
 			this->output = this->forward();
@@ -45,7 +45,7 @@ namespace dl {
 			throw std::runtime_error("Gradient output matrix is empty");
 		}
 
-		DeviceMatrix output = DeviceMatrix::matElementWiseMul(DeviceMatrix::ReLUGradient(this->input), gradient_output);
+		DeviceMatrix output = DeviceMatrix::matElementWiseMul(DeviceMatrix::ReLUGradient(this->output), gradient_output);
 
 		return output;
 	}

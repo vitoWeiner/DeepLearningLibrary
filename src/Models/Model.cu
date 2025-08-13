@@ -141,6 +141,10 @@ namespace dl {
 
 			unit->setInput(std::move(output));
 			output = unit->forward();
+            
+            if (!unit->backpropNeedsInput()) {
+                unit->setInput(Matrix());  // create empty input (with nullptr)
+            }
 		}
 
 		return output;
@@ -180,6 +184,7 @@ namespace dl {
 
     void Model::setTrainingData(std::shared_ptr<TrainingData> training_data) {
         this->training_data = std::move(training_data);
+        this->input = std::move(this->training_data->getInputSamples()); /// OVU LINIJU MAKNUTI KASNIJE
         
     }
 
@@ -283,6 +288,20 @@ namespace dl {
 		cost.downloadToHost().print();
 
 
+    }
+
+    float Model::computeCost() {
+        if (this->cost_function == nullptr)
+            throw std::runtime_error("no cost function provided to compute cost");
+
+        if (this->training_data == nullptr)
+            throw std::runtime_error("no training data provided to compute cost");
+
+        if (this->input.totalSize() == 0) {
+            this->input = std::move(this->training_data->getInputSamples());
+        }
+
+        return this->cost_function->compute(this->forward(), this->training_data->getOutputSamples()).downloadToHost().getAt(0);
     }
 
 

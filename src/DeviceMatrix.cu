@@ -92,10 +92,10 @@ DeviceMatrix& DeviceMatrix::operator=(const DeviceMatrix& other)
     return *this;
 }
 
-DeviceMatrix::DeviceMatrix(const Matrix& other) :
-    device_matrix(nullptr), rows_count(other.rows()), cols_count(other.cols()), total_size(other.totalSize()) {
+DeviceMatrix::DeviceMatrix(const Matrix& mat) :
+    device_matrix(nullptr), rows_count(mat.rows()), cols_count(mat.cols()), total_size(mat.totalSize()) {
 
-    const float* temp_arr = other.borrowData();
+    const float* temp_arr = mat.borrowData();
 
     if (temp_arr == nullptr) {
         return;

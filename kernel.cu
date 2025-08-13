@@ -36,6 +36,7 @@ svi ostalo konstruktori u pravilu rade deep copy
 #include <iostream>
 
 
+
 void f() {
 
 	{
@@ -86,9 +87,33 @@ int main()
 
 	
 	
-	f();
-	std::cout << "second time : " << DeviceMatrix::instances << std::endl;
+	Model model({
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 4)),
+		std::make_shared<ReLU>(),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(4, 6)),
+		std::make_shared<ReLU>(),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(6, 4)),
+		std::make_shared<Sigmoid>(),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(4, 1)),
+		std::make_shared<Sigmoid>()
+		});
 
+	std::shared_ptr<TrainingData> data = std::make_shared<TrainingData>();
+
+
+	data->add({ 1, 1 }, {1});
+	data->add({ 1, 0 }, {0});
+	data->add({ 0, 1 }, {1});
+	data->add({ 0, 0 }, { 0 });
+
+	model.setTrainingData(data);
+	model.setCostFunction(std::make_shared<MSE>());
+
+	model.trainSingleBatchGD(10000, 0.5);
+
+	model.print();
+
+	model.evaluate();
 
 
 

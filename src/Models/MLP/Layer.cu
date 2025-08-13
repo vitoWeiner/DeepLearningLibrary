@@ -130,7 +130,7 @@ namespace dl {
         		throw std::runtime_error("Gradient output must have the same number of rows as the layer's output size");
         
         	// gradients calculation
-        	DeviceMatrix gradient_weights = DeviceMatrix::matMul(gradient_output, DeviceMatrix::matTranspose(input));
+        	DeviceMatrix gradient_weights = DeviceMatrix::matMul(gradient_output, DeviceMatrix::matTranspose(this->input));
         	DeviceMatrix gradient_biases = DeviceMatrix::matColReduce(gradient_output);
         	DeviceMatrix gradient_input = this->backpropagate(gradient_output);
         

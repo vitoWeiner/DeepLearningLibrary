@@ -78,6 +78,8 @@ namespace dl {
 
         size_t parameterCount() const override;
 
+        float computeCost();
+
         friend std::shared_ptr<LearningUnit> operator+(const std::shared_ptr<LearningUnit> & model, const std::shared_ptr<LearningUnit>& unit);
 
 	};  // class Model

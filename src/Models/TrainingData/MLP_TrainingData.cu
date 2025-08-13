@@ -40,7 +40,54 @@ namespace dl {
 		return true;
 	}
 
+	DeviceMatrix TrainingData::getInputSamples() {
+		if (!this->validate()) {
+			throw std::runtime_error("from TrainingData::getSingleBatches -> problem : trainingData not valid");
+		}
 
+
+		if (inputs.empty()) {
+			throw std::runtime_error("TrainingData::getSingleBatches called on empty dataset.");
+		}
+
+		Matrix input_batch(inputs[0].size(), inputs.size());
+
+		for (size_t col = 0; col < inputs.size(); ++col) {
+			for (size_t row = 0; row < inputs[col].size(); ++row) {
+
+				input_batch.setAt(inputs[col][row], row, col);
+
+			}
+		}
+
+		return DeviceMatrix(input_batch);
+
+	}
+
+	DeviceMatrix TrainingData::getOutputSamples() {
+
+		if (!this->validate()) {
+			throw std::runtime_error("from TrainingData::getSingleBatches -> problem : trainingData not valid");
+		}
+
+
+		if (inputs.empty()) {
+			throw std::runtime_error("TrainingData::getSingleBatches called on empty dataset.");
+		}
+
+		Matrix output_batch(outputs[0].size(), outputs.size());
+
+		for (size_t col = 0; col < inputs.size(); ++col) {
+			
+			for (size_t row = 0; row < outputs[col].size(); ++row) {
+
+				output_batch.setAt(outputs[col][row], row, col);
+			}
+		}
+
+		return DeviceMatrix(output_batch);
+
+	}
 
 	std::pair<DeviceMatrix, DeviceMatrix> TrainingData::getSingleBatches() {
 
@@ -67,6 +114,8 @@ namespace dl {
 				output_batch.setAt(outputs[col][row], row, col);
 			}
 		}
+
+		
 
 		return { DeviceMatrix(input_batch), DeviceMatrix(output_batch) };
 	}

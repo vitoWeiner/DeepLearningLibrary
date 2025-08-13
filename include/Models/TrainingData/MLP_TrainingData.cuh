@@ -25,6 +25,8 @@ namespace dl {
         bool validate() const;
 
         std::pair<DeviceMatrix, DeviceMatrix> getSingleBatches();
+        DeviceMatrix getOutputSamples();
+        DeviceMatrix getInputSamples();
 
         ~TrainingData() = default;
     

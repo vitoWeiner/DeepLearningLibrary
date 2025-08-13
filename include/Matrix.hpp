@@ -5,7 +5,7 @@
 #include <utility>      // std::pair
 #include <string>       // std::string
 #include <vector>
-
+#include <functional>
 
 namespace dl {
 
@@ -42,6 +42,7 @@ namespace dl {
         size_t rows() const noexcept;
         size_t cols() const noexcept;
         size_t totalSize() const noexcept;
+        bool check(const std::function<bool(float)>& predicate);
     
         const float* borrowData() const noexcept;
     

@@ -798,18 +798,18 @@ __global__ void ReLU_gradient_kernel(float* output, const float* relu_output, si
     output[idx] = (relu_output[idx] > 0) ? 1.0f : 0.0f;
 }
 
-DeviceMatrix DeviceMatrix::ReLUGradient(const DeviceMatrix& input) {
+DeviceMatrix DeviceMatrix::ReLUGradient(const DeviceMatrix& relu_output) {
 
-    if (input.totalSize() == 0) {
+    if (relu_output.totalSize() == 0) {
         throw std::runtime_error("ReLU gradient error: Input matrix is empty");
     }
 
-    DeviceMatrix output(input.rows(), input.cols());
+    DeviceMatrix output(relu_output.rows(), relu_output.cols());
 
     dim3 blockSize(TILE_WIDTH, TILE_HEIGHT);
-    dim3 gridSize((input.cols() + TILE_WIDTH - 1) / TILE_WIDTH, (input.rows() + TILE_HEIGHT - 1) / TILE_HEIGHT);
+    dim3 gridSize((relu_output.cols() + TILE_WIDTH - 1) / TILE_WIDTH, (relu_output.rows() + TILE_HEIGHT - 1) / TILE_HEIGHT);
 
-    ReLU_gradient_kernel << <gridSize, blockSize >> > (output.device_matrix, input.device_matrix, input.rows(), input.cols());
+    ReLU_gradient_kernel << <gridSize, blockSize >> > (output.device_matrix, relu_output.device_matrix, relu_output.rows(), relu_output.cols());
 
     cudaDeviceSynchronize();
 

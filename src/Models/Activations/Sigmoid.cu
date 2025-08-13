@@ -13,9 +13,9 @@ namespace dl {
 			return input;
 		}
 
-		output = DeviceMatrix::Sigmoid(input);
+		this->output = DeviceMatrix::Sigmoid(this->input);
 
-		return output;
+		return this->output;
 	}
 
 	DeviceMatrix Sigmoid::backpropagate(DeviceMatrix gradient_output) {
@@ -23,7 +23,7 @@ namespace dl {
 			return DeviceMatrix();
 		}
 		
-		DeviceMatrix sigmoid_gradient = DeviceMatrix::SigmoidGradient(output);
+		DeviceMatrix sigmoid_gradient = DeviceMatrix::SigmoidGradient(this->output);
 		DeviceMatrix grad_input = DeviceMatrix::matElementWiseMul(gradient_output, sigmoid_gradient);
 
 		return grad_input;
@@ -35,7 +35,7 @@ namespace dl {
 			return DeviceMatrix();
 		}
 	    
-		return this->backpropagate(gradient_output);
+		return this->backpropagate(std::move(gradient_output));
 		
 	}
 

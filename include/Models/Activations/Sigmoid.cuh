@@ -25,6 +25,8 @@ namespace dl {
         void print(const char* header = "\nLearningUnit analytics:") const override;
 
         bool has_variable_input() const override { return true; }
+
+        bool backpropNeedsInput() const override { return false; }
     
     
     };

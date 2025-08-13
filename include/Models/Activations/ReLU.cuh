@@ -24,6 +24,7 @@ namespace dl
 
 		size_t parameterCount() const override { return 0; }
 		bool has_variable_input() const override { return true; }
+		bool backpropNeedsInput() const override { return false; }
 		void print(const char* header = "\nReLU analytics:") const override {};  //RELU ANALYTICS
 	};
 
