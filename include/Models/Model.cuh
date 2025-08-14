@@ -64,6 +64,8 @@ namespace dl {
 
         void trainSingleBatchGD(size_t epochs, float learning_rate = 0.01f);
 
+        void trainMiniBatchSGD(size_t epochs, size_t batch_size, float learning_rate = 0.01f);
+
         void evaluate();
 
         std::shared_ptr<LearningUnit> clone() const override;

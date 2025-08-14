@@ -24,7 +24,9 @@ namespace dl {
 
         bool validate() const;
 
+        std::pair<std::vector<DeviceMatrix>, std::vector<DeviceMatrix>> getMiniBatches(size_t batch_size);
         std::pair<DeviceMatrix, DeviceMatrix> getSingleBatches();
+
         DeviceMatrix getOutputSamples();
         DeviceMatrix getInputSamples();
 

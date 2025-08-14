@@ -59,6 +59,8 @@ namespace dl {
         static Matrix Zero(size_t rows, size_t cols);
         static Matrix Random(size_t rows, size_t cols, std::pair<float, float> range = { 0.0f, 1.0f });
         static Matrix DownloadFromBinary(const std::string& filename);
+        static Matrix matConcatCols(const Matrix& a, const Matrix& b);
+        static Matrix matConcatRows(const Matrix& a, const Matrix& b);
     
         static Matrix elementWiseMultiply(const Matrix& a, const Matrix& b);
         static Matrix columnReduce(const Matrix& a);

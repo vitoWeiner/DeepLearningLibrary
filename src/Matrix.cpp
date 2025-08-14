@@ -228,6 +228,34 @@ bool Matrix::check(const std::function<bool(float)>& predicate) {
     return true;
 }
 
+Matrix Matrix::matConcatCols(const Matrix& a, const Matrix& b) {
+    if (a.rows() != b.rows())
+        throw std::runtime_error("in Matrix::matConcatCols : a.rows() != b.rows()");
+
+    Matrix result(a.rows(), a.cols() + b.cols());
+
+    for (size_t row = 0; row < result.rows(); ++row) {
+        std::memcpy(result.matrix + row * result.cols(), a.matrix + row * a.cols(), sizeof(float) * a.cols());
+        std::memcpy(result.matrix + row * result.cols() + a.cols(), b.matrix + row * b.cols(), sizeof(float) * b.cols());
+    }
+
+    return result;
+
+}
+
+Matrix Matrix::matConcatRows(const Matrix& a, const Matrix& b) {
+    if (a.cols() != b.cols())
+        throw std::runtime_error("in Matrix::matConcatRows : a.cols() != b.cols()");
+
+    Matrix result(a.rows() + b.rows(), a.cols());
+
+    std::memcpy(result.matrix, a.matrix, a.totalSize() * sizeof(float));
+    std::memcpy(result.matrix + a.totalSize(), b.matrix, b.totalSize() * sizeof(float));
+
+    return result;
+
+}
+
 Matrix Matrix::elementWiseMultiply(const Matrix& a, const Matrix& b) {
     if (a.rows() != b.rows() || a.cols() != b.cols()) {
         throw std::invalid_argument("Matrix elementWiseMultiply error: incompatible dimensions");

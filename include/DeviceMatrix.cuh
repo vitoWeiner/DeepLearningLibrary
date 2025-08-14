@@ -60,7 +60,10 @@ namespace dl {
         Matrix downloadToHost() const;
         void downloadToHost(float* buffer) const;
     	void clean() noexcept;  // clean up all data from object
-    
+
+
+        static DeviceMatrix matConcatCols(const DeviceMatrix& A, const DeviceMatrix& B);
+        static DeviceMatrix matConcatRows(const DeviceMatrix& A, const DeviceMatrix& B);
          static DeviceMatrix matMul(const DeviceMatrix& A, const DeviceMatrix& B); // working fine
        
         static DeviceMatrix matAdd(const DeviceMatrix& A, const DeviceMatrix& B); // working fine

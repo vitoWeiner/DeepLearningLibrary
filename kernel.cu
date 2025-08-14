@@ -86,7 +86,7 @@ int main()
 {
 
 	
-	
+	/*
 	Model model({
 		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 4)),
 		std::make_shared<ReLU>(),
@@ -115,6 +115,25 @@ int main()
 
 	model.evaluate();
 
+	*/
+
+/*	TrainingData data;
+
+	data.add({ 1, 0 }, { 1 });
+	data.add({ 0, 1 }, { 1 });
+	data.add({ 1, 1 }, { 1 });
+	data.add({ 0, 0 }, { 0 });
+
+	std::pair<std::vector<DeviceMatrix>, std::vector<DeviceMatrix>> mini_batches = data.getMiniBatches(1);
+
+	for (DeviceMatrix& batch : mini_batches.first) {
+		batch.downloadToHost().print();
+
+		printf("\n");
+	}
+	*/
+
+	
 
 
     return 0;
