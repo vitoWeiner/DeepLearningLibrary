@@ -54,7 +54,7 @@ Model ::= LearningUnit+
 			}*/
 
 
-			input = std::move(input_matrix);
+			this->input = std::move(input_matrix);
 			
 		}
 

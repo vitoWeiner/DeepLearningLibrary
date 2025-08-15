@@ -84,6 +84,8 @@ namespace dl {
 
         friend std::shared_ptr<LearningUnit> operator+(const std::shared_ptr<LearningUnit> & model, const std::shared_ptr<LearningUnit>& unit);
 
+        void downloadToBinary(const char* filepath);
+
 	};  // class Model
 
 

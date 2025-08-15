@@ -541,6 +541,84 @@ DeviceMatrix DeviceMatrix::matColReduce(const DeviceMatrix& A) {
 }
 
 
+__inline__ __device__
+float warp_reduce_sum(float val) {  // binary halving reduction
+
+
+    unsigned mask = 0xffffffffu;  // mask of threads that participate in collective operation "https://developer.nvidia.com/blog/using-cuda-warp-level-primitives"
+
+
+    val += __shfl_down_sync(mask, val, 16);
+    val += __shfl_down_sync(mask, val, 8);
+    val += __shfl_down_sync(mask, val, 4);
+    val += __shfl_down_sync(mask, val, 2);
+    val += __shfl_down_sync(mask, val, 1);
+    return val;
+}
+
+__global__
+void col_reduce_op(float* result, const float* matrix, size_t rows, size_t cols, size_t pitch_cols) {
+
+    size_t row = blockIdx.y;
+    if (row >= rows) return;
+
+    extern __shared__ float s_warp_sums[];
+
+
+    float local = 0.0f;
+    for (size_t col = threadIdx.x; col < cols; col += blockDim.x) {
+        size_t idx = row * pitch_cols + col;
+        local += matrix[idx];
+    }
+
+    //   bool is_valid = (threadIdx.x % 32 <= 15);
+
+
+    local = warp_reduce_sum(local);
+
+
+    int lane = threadIdx.x & 31;
+    int warpId = threadIdx.x >> 5;
+    if (lane == 0) s_warp_sums[warpId] = local;
+    __syncthreads();
+
+
+    float block_sum = 0.0f;
+    int numWarps = (blockDim.x + 31) / 32;
+    if (threadIdx.x < 32) {
+        float v = (threadIdx.x < numWarps) ? s_warp_sums[threadIdx.x] : 0.0f;
+        block_sum = warp_reduce_sum(v);
+    }
+
+
+    if (threadIdx.x == 0) result[row] = block_sum;
+}
+
+
+DeviceMatrix DeviceMatrix::matColReduceV2(const DeviceMatrix& A) {
+
+    if (A.totalSize() == 0 || A.cols() == 1)
+        return A;
+
+
+    DeviceMatrix result(A.rows(), 1);
+
+    int threads = 256;
+    dim3 block(threads, 1, 1);
+    dim3 grid(1, A.rows(), 1);
+    size_t shared_bytes = sizeof(float) * ((threads + 31) / 32);  // == broj warpova u bloku * sizeof(float); // ako ce se staticki alocirati onda najbolje 32 warpa jer (blockDim.x <= 1024 --> warps count <= 32) ali ovako je bolje dinamicki alocirati da ne bude bezveze previse shared memory alocirano
+
+    col_reduce_op << <grid, block, shared_bytes >> > (result.device_matrix, A.device_matrix, A.rows(), A.cols(), A.cols());  // kasnije mozda bude trebalo pitched cols
+
+    cudaDeviceSynchronize();
+
+    return result;
+
+}
+
+
+
+
 // OPREZ OVO JE TRIVIJALNA IMPLEMENTACIJA, TREBA REIMPLEMENTIRATI S PAMETNIJIM ALGORITMOM KOJI KORISTI COALESCED MEM ACCESS ZA UBRZANJE
 
 __global__ void row_reduce_kernel(float* result, const float* matrix, size_t rows, size_t cols) {

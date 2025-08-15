@@ -32,7 +32,7 @@ std::vector<float> loadGrayscaleImageAsVector(const std::string& image_path, int
 }
 
 
-int main2() {
+int Notmain() {
 
     srand(time(0));
 
@@ -77,7 +77,7 @@ int main2() {
 
         trainStep();
         getCurrentOutput(current_output.data());
-        std::cout << getCost() << "\n";
+        //std::cout << getCost() << "\n";
 
 
         Color* pixels = new Color[img_width * img_height];

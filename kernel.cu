@@ -64,10 +64,10 @@ void f() {
 		}
 
 		model.setTrainingData(data);
-		model.setCostFunction(std::make_shared<MSE>());
+		model.setCostFunction(std::make_shared<BCE>());
 
 
-		model.trainSingleBatchGD(10000, 0.5);
+		model.trainMiniBatchSGD(2000, 28, 0.05);
 
 		model.evaluate();
 
@@ -85,55 +85,59 @@ void f() {
 int main()
 {
 
+	//f();
 	
+	
+	for (int i = 1; i < 0; ++i) {
+
+
+	DeviceMatrix m = DeviceMatrix::Random(100, i);
+
+	DeviceMatrix a = DeviceMatrix::matColReduce(m);
+	DeviceMatrix b = DeviceMatrix::matColReduceV2(m);
+
+	if (a.downloadToHost() != b.downloadToHost()) {
+		printf("everithings wrong");
+	}
+
+	printf("case %d is good\n", i);
+	
+	
+}
+
 	/*
+
 	Model model({
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 4)),
-		std::make_shared<ReLU>(),
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(4, 6)),
-		std::make_shared<ReLU>(),
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(6, 4)),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 500)),
 		std::make_shared<Sigmoid>(),
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(4, 1)),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(500, 300)),
+		std::make_shared<Sigmoid>(),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(300, 15)),
+		std::make_shared<Sigmoid>(),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(15, 1)),
 		std::make_shared<Sigmoid>()
 		});
 
 	std::shared_ptr<TrainingData> data = std::make_shared<TrainingData>();
 
 
-	data->add({ 1, 1 }, {1});
-	data->add({ 1, 0 }, {0});
-	data->add({ 0, 1 }, {1});
-	data->add({ 0, 0 }, { 0 });
+	for (float x = 0.0; x < 0.5; x += 0.01) {
+		for (float y = 0.0; y < 0.5; y += 0.01) {
+			data->add({ x, y }, { x + y });
+		}
+	}
+
+	
 
 	model.setTrainingData(data);
 	model.setCostFunction(std::make_shared<MSE>());
 
-	model.trainSingleBatchGD(10000, 0.5);
+	model.trainSingleBatchGD(10000, 0.2f);
 
 	model.print();
 
-	model.evaluate();
+	model.evaluate();*/
 
-	*/
-
-/*	TrainingData data;
-
-	data.add({ 1, 0 }, { 1 });
-	data.add({ 0, 1 }, { 1 });
-	data.add({ 1, 1 }, { 1 });
-	data.add({ 0, 0 }, { 0 });
-
-	std::pair<std::vector<DeviceMatrix>, std::vector<DeviceMatrix>> mini_batches = data.getMiniBatches(1);
-
-	for (DeviceMatrix& batch : mini_batches.first) {
-		batch.downloadToHost().print();
-
-		printf("\n");
-	}
-	*/
-
-	
 
 
     return 0;

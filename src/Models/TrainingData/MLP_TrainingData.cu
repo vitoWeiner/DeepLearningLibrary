@@ -132,7 +132,7 @@ namespace dl {
 		return { DeviceMatrix(input_batch), DeviceMatrix(output_batch) };
 	}
 
-	std::pair<std::vector<DeviceMatrix>, std::vector<DeviceMatrix>> TrainingData::getMiniBatches(size_t batch_size) {
+	std::pair<std::vector<DeviceMatrix>, std::vector<DeviceMatrix>> TrainingData::getMiniBatchesShuffled(size_t batch_size) {
 
 		if (this->inputs.empty())  // implies outputs are empty;  
 			throw std::runtime_error("there is no inputs and outputs");

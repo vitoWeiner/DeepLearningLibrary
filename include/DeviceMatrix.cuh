@@ -74,6 +74,7 @@ namespace dl {
         static DeviceMatrix matScale(const DeviceMatrix& A, float scalar); // working fine
         static DeviceMatrix matColReduce(const DeviceMatrix& A); // working fine
         static DeviceMatrix matRowReduce(const DeviceMatrix& A); // working fine
+        static DeviceMatrix matColReduceV2(const DeviceMatrix& A);
        
         static DeviceMatrix trivialMatMul(const DeviceMatrix& A, const DeviceMatrix& B);
         static DeviceMatrix trivialUncoalescedMatMul(const DeviceMatrix& A, const DeviceMatrix& B);

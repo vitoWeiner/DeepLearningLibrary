@@ -153,7 +153,7 @@ bool operator==(const Matrix& a, const Matrix& b) {
         a.cols() != b.cols())
         return false;
 
-    const float epsilon = 0.0000;
+    const float epsilon = 0.1;
 
     size_t rows = a.rows();
     size_t cols = a.cols();

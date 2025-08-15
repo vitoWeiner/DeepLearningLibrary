@@ -4,6 +4,10 @@
 #include <initializer_list>
 #include <vector>
 #include <stdexcept>
+#include <algorithm>
+#include <random>
+#include <utility>
+#include <fstream>
 
 namespace dl {
 
@@ -214,11 +218,9 @@ namespace dl {
 
             DeviceMatrix output = this->forward();
             
-
-
-
-            if (epoch % 10 == 0)
+            if (epoch % 2 == 0) {
 			   this->cost_function->compute(output, target_matrix).downloadToHost().print();
+            }
 
 			DeviceMatrix gradient_output = this->cost_function->gradient(output, target_matrix);
 
@@ -226,9 +228,70 @@ namespace dl {
         
         }
 
+        return; //end of training
+    }
+
+    void Model::trainMiniBatchSGD(size_t epochs, size_t batch_size, float learning_rate) {
+
+        if (this->cost_function == nullptr) {
+            throw std::runtime_error("Cost function is not set. Please set a cost function before training.");
+        }
+
+        if (this->learning_units.empty()) {
+            return;
+        }
+
+        if (this->training_data == nullptr) {
+            throw std::runtime_error("Training data is not set. Please set training data before training.");
+        }
+
+        std::pair<std::vector<DeviceMatrix>, std::vector<DeviceMatrix>> mini_batches = this->training_data->getMiniBatchesShuffled(batch_size);
+
+
+        for (size_t epoch = 0; epoch < epochs; ++epoch) {
+
+
+        /*std::vector<size_t> order(mini_batches.first.size());*/
+
+
+        //static std::random_device rd;
+        //static std::mt19937 g(rd());
+
+        //std::shuffle(order.begin(), order.end(), g);
+
+        /*for (size_t i = 0; i < order.size(); ++i) {
+            order[i] = i;
+        }*/
+        
+        for (size_t mini_batch_idx = 0; mini_batch_idx < mini_batches.first.size(); ++mini_batch_idx) {
+
+                DeviceMatrix& mini_batch_input = mini_batches.first[mini_batch_idx];
+                DeviceMatrix& mini_batch_output = mini_batches.second[mini_batch_idx];
+
+                this->setInput(mini_batch_input);
+
+                DeviceMatrix output = this->forward();
+
+                //this->setInput(DeviceMatrix());  // to optimize usage little bit (first unit copied model->input)
+
+                if (mini_batch_idx % 10 == 0) {
+                    this->cost_function->compute(output, mini_batch_output).downloadToHost().print();
+                }
+
+                DeviceMatrix gradient_output = this->cost_function->gradient(output, mini_batch_output);
+
+                gradient_output = this->updateParamsAndBackpropagate(std::move(gradient_output), learning_rate);
+
+            }
+        }
+
+        this->setInput(this->training_data->getInputSamples());
+
+        return; // end of training
 
 
     }
+
 
     void Model::evaluate()  {
 
@@ -341,7 +404,19 @@ namespace dl {
     }
 
     
+    void Model::downloadToBinary(const char* filepath) {
 
+
+        std::ofstream ofile(filepath, std::ios::binary);
+
+        if (!ofile) {
+            throw std::runtime_error("Matrix downloadToBinary error: could not open file for writing" + std::string(filepath));
+        }
+
+        ofile.close();
+
+
+    }
 
     void Model::print(const char* header) const {
         printf("\nModel analytics:\n");

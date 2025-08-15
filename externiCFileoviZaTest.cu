@@ -21,13 +21,15 @@ static std::shared_ptr<TrainingData> data;
 
 extern "C" void initTraining(float* target_data, int width, int height) {
 	mlp = std::make_shared<Model>(Model({
-	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 7, {-1, 1})),
+	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 9, {-1, 1})),
 	std::make_shared<Sigmoid>(),
-	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(7, 4, {-1, 1})),
+	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(9, 9, {-1, 1})),
 	std::make_shared<Sigmoid>(),
-	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(4, 1, {-1, 1})),
+	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(9, 1, {-1, 1})),
 	std::make_shared<Sigmoid>()
 		}));
+
+
 
 	Matrix out(target_data, height, width);
 
@@ -40,7 +42,7 @@ extern "C" void initTraining(float* target_data, int width, int height) {
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
 			data->add(
-				{ static_cast<float>(i) / 27.0f, static_cast<float>(j) / 27.0f },
+				{ static_cast<float>(i) / 27, static_cast<float>(j) / 27 },
 				{ out.getAt(i, j) }
 			);
 		}
@@ -51,12 +53,12 @@ extern "C" void initTraining(float* target_data, int width, int height) {
 			});*/
 
 	mlp->setTrainingData(data);
-	mlp->setCostFunction(std::make_shared<BCE>());
+	mlp->setCostFunction(std::make_shared<MSE>());
 
 }
 
 extern "C" void trainStep() {
-	mlp->trainSingleBatchGD(20, 5.f);
+	mlp->trainMiniBatchSGD(10, 24, 0.05F);
 }
 
 extern "C" float getCost() {
