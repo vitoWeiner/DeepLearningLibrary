@@ -80,6 +80,7 @@
   <ItemGroup>
     <CudaCompile Include="externi2.cu" />
     <CudaCompile Include="externiCFileoviZaTest.cu" />
+    <CudaCompile Include="handwritenDigits.cu" />
     <CudaCompile Include="include\Models\CostFunctions\CostFunction.cuh" />
     <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="src\DeviceMatrix.cu" />
@@ -105,6 +106,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="main2.cpp" />
+    <ClCompile Include="main3.cpp" />
     <ClCompile Include="src\Matrix.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

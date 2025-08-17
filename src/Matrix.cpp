@@ -281,6 +281,22 @@ float Matrix::getAt(size_t global_index) const {
 }
 
 
+std::vector<float> Matrix::toStdVector() {
+
+    std::vector<float> result;
+    size_t size = this->totalSize();
+
+    result.reserve(size);
+
+    for (size_t i = 0; i < size; ++i) {
+        result.push_back(this->matrix[i]);
+    }
+
+    return result;
+    
+}
+
+
 void Matrix::print(size_t rows, size_t cols) const noexcept {
 
     if (rows == 0) {

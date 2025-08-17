@@ -46,8 +46,8 @@ extern "C" void initTraining(float* img1_data, float* img2_data, int width, int 
             float nx = (static_cast<float>(j) / (width - 1)) * 2.0f - 1.0f;
             float ny = (static_cast<float>(i) / (height - 1)) * 2.0f - 1.0f;
 
-            data->add({ -0.0f, nx, ny }, { out1.getAt(i, j) });
-            data->add({ 0.2f, nx, ny }, { out2.getAt(i, j) });
+            data->add({ -1.0f, nx, ny }, { out1.getAt(i, j) });
+            data->add({ -1.0f + 0.2, nx, ny }, { out2.getAt(i, j) });
         }
     }
 

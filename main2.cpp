@@ -49,7 +49,7 @@ int main() {  // image interpolation program
 
     std::vector<float> img1, img2;
     try {
-        img1 = loadGrayToVector("C:/Users/Vito/Desktop/DesktopApp/DeepLearningLib/smile.png", imgW, imgH);
+        img1 = loadGrayToVector("C:/Users/Vito/Desktop/DesktopApp/DeepLearningLibrary/house.png", imgW, imgH);
         img2 = loadGrayToVector("C:/Users/Vito/Desktop/DesktopApp/DeepLearningLibrary/man.png", imgW, imgH);
     }
     catch (const std::exception& e) {

@@ -371,7 +371,7 @@ void DeviceMatrix::clean() noexcept {
 DeviceMatrix::~DeviceMatrix() {
     if (device_matrix != nullptr) {
         cudaFree(device_matrix);
-		DeviceMatrix::decrement(this->id);
+//		DeviceMatrix::decrement(this->id);
     }
 }
 

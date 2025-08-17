@@ -187,7 +187,7 @@ namespace dl {
     }
 
     void Model::setTrainingData(std::shared_ptr<TrainingData> training_data) {
-        this->training_data = std::move(training_data);
+        this->training_data = training_data;
         this->input = std::move(this->training_data->getInputSamples()); /// OVU LINIJU MAKNUTI KASNIJE
         
     }
@@ -332,6 +332,7 @@ namespace dl {
 
 		Matrix input_host = input_matrix.downloadToHost();
 		Matrix output_host = output.downloadToHost();
+        Matrix target_host = this->training_data->getOutputSamples().downloadToHost();
 
         if (input_host.cols() != output_host.cols()) {
 			throw std::runtime_error("Input and output matrices must have the same number of samples. Something is wrong!!!");
@@ -354,6 +355,10 @@ namespace dl {
 			printf("\noutput:\n");
             for (size_t row = 0; row < output_host.rows(); ++row) {
 				printf("%f ", output_host.getAt(row, sample));
+            }
+            printf("\ntrue output: \n");
+            for (size_t row = 0; row < target_host.rows(); ++row) {
+                printf("%f ", target_host.getAt(row, sample));
             }
             printf("\n__________\n");
 						

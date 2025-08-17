@@ -23,6 +23,7 @@ namespace dl {
         size_t sampleCount();
 
         bool validate() const;
+        void clear();
 
         std::pair<std::vector<DeviceMatrix>, std::vector<DeviceMatrix>> getMiniBatchesShuffled(size_t batch_size);
         std::pair<DeviceMatrix, DeviceMatrix> getSingleBatches();

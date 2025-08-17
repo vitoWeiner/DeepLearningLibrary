@@ -7,6 +7,8 @@
 namespace dl {
 	TrainingData::TrainingData() {}
 
+
+
 	void TrainingData::add(const std::vector<float>& input, const std::vector<float>& output) {
 
 		if (input.empty() || output.empty())
@@ -98,6 +100,12 @@ namespace dl {
 		}
 
 		return DeviceMatrix(output_batch);
+
+	}
+
+	void TrainingData::clear() {
+		this->inputs.clear();
+		this->outputs.clear();
 
 	}
 

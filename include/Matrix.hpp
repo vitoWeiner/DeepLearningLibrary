@@ -51,6 +51,8 @@ namespace dl {
         Matrix transpose() const;
     
     	void clean() noexcept;
+
+        std::vector<float> toStdVector();
     
     
         // statics:

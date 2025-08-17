@@ -25,6 +25,7 @@ namespace dl {
 		long long id;  
 
         static void increment(DeviceMatrix* edit) {
+            return;
             if (DeviceMatrix::instances >= 10000)
 				throw std::runtime_error("DeviceMatrix instances limit reached. Possible memory leak or incorrect usage.");
 			DeviceMatrix::instances++;
@@ -34,6 +35,7 @@ namespace dl {
         }
 
         static void decrement(int id_m) {
+            return;
             if (DeviceMatrix::instances == 0)
                 printf("shit happend");
 			DeviceMatrix::instances--;
