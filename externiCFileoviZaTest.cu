@@ -1,3 +1,5 @@
+
+/*
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -21,11 +23,13 @@ static std::shared_ptr<TrainingData> data;
 
 extern "C" void initTraining(float* target_data, int width, int height) {
 	mlp = std::make_shared<Model>(Model({
-	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 9, {-1, 1})),
+	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 28, {-8, 8})),
 	std::make_shared<Sigmoid>(),
-	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(9, 9, {-1, 1})),
+	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(28, 28, {-8, 8})),
 	std::make_shared<Sigmoid>(),
-	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(9, 1, {-1, 1})),
+	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(28, 28, {-8, 8})),
+	std::make_shared<Sigmoid>(),
+	std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(28, 1, {-8, 8})),
 	std::make_shared<Sigmoid>()
 		}));
 
@@ -33,9 +37,7 @@ extern "C" void initTraining(float* target_data, int width, int height) {
 
 	Matrix out(target_data, height, width);
 
-	/*bool x = out.check([](float x)->bool {
-		return (x <= 1) && (x >= 0);
-		});*/
+
 
 	data = std::make_shared<TrainingData>();
 
@@ -48,9 +50,7 @@ extern "C" void initTraining(float* target_data, int width, int height) {
 		}
 	}
 
-	/*	bool y = data->getOutputSamples().downloadToHost().check([](float x)->bool {
-			return (x <= 1) && (x >= 0);
-			});*/
+
 
 	mlp->setTrainingData(data);
 	mlp->setCostFunction(std::make_shared<MSE>());
@@ -58,7 +58,7 @@ extern "C" void initTraining(float* target_data, int width, int height) {
 }
 
 extern "C" void trainStep() {
-	mlp->trainMiniBatchSGD(10, 24, 0.05F);
+	mlp->trainSingleBatchGD(10, 2);
 }
 
 extern "C" float getCost() {
@@ -71,3 +71,4 @@ extern "C" void getCurrentOutput(float* out_buffer) {
 	g_output = mlp->forward(); // napravimo forward pass
 	g_output.downloadToHost(out_buffer); // prebacimo u CPU buffer
 }
+*/

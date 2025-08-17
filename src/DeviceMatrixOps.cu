@@ -518,7 +518,7 @@ __global__ void sum_reduce_kernel(float* result, const float* matrix, size_t row
     result[row] = sum;
 }
 
-DeviceMatrix DeviceMatrix::matColReduce(const DeviceMatrix& A) {
+DeviceMatrix DeviceMatrix::matColSum(const DeviceMatrix& A) {
     if (A.totalSize() == 0) {
         return A;
     }
@@ -545,7 +545,7 @@ __inline__ __device__
 float warp_reduce_sum(float val) {  // binary halving reduction
 
 
-    unsigned mask = 0xffffffffu;  // mask of threads that participate in collective operation "https://developer.nvidia.com/blog/using-cuda-warp-level-primitives"
+    unsigned mask = 0xffffffffu;  // mask of threads that participate in collective operation, ovdje sve pise : "https://developer.nvidia.com/blog/using-cuda-warp-level-primitives"
 
 
     val += __shfl_down_sync(mask, val, 16);
@@ -566,36 +566,36 @@ void col_reduce_op(float* result, const float* matrix, size_t rows, size_t cols,
 
 
     float local = 0.0f;
-    for (size_t col = threadIdx.x; col < cols; col += blockDim.x) {
+    for (size_t col = threadIdx.x; col < cols; col += blockDim.x) {   // matrica moze imati vise stupaca nego je alociranih threadova, threadovi coalesced iteriraju po svim segmentima u periodu velicine blockDim.x
         size_t idx = row * pitch_cols + col;
-        local += matrix[idx];
+        local += matrix[idx];  
+    } // u ovom trenutku svi threadovi u warpu imaju svoju vrijednost u registru local
+
+    
+
+
+    local = warp_reduce_sum(local);  // nakon ove naredbe prvi thread warpa ce imati u registru local vrijednost koja predstavlja sumu za warp
+
+
+    int lane = threadIdx.x & 31;  // prvi thrad warpa
+    int warpId = threadIdx.x >> 5;  // indeks warpa
+    if (lane == 0) s_warp_sums[warpId] = local;  // prvi thread warpa upisuje vrijednost sume za warp u shared memoriju
+    __syncthreads();  // svi warpovi bloka moraju doci do ove linije prije dalje
+
+    // jedan blok == jedan row matrice
+    float block_sum = 0.0f;  // sada treba napraviti redukciju s_warp_sums polja da bi dobili za cijeli blok
+    int numWarps = (blockDim.x + 31) / 32;  // broj warpova bloka
+    if (threadIdx.x < 32) {  // prvi thread svakog warpa racuna redukciju s_warp_sums polja
+        float v = (threadIdx.x < numWarps) ? s_warp_sums[threadIdx.x] : 0.0f;  // svaki thread warpa koji racuna redukciju pristupa sumi jednog warpa, ako je thread izvan warpa, postavlja 0.0f
+        block_sum = warp_reduce_sum(v); // redukcija
     }
 
-    //   bool is_valid = (threadIdx.x % 32 <= 15);
 
-
-    local = warp_reduce_sum(local);
-
-
-    int lane = threadIdx.x & 31;
-    int warpId = threadIdx.x >> 5;
-    if (lane == 0) s_warp_sums[warpId] = local;
-    __syncthreads();
-
-
-    float block_sum = 0.0f;
-    int numWarps = (blockDim.x + 31) / 32;
-    if (threadIdx.x < 32) {
-        float v = (threadIdx.x < numWarps) ? s_warp_sums[threadIdx.x] : 0.0f;
-        block_sum = warp_reduce_sum(v);
-    }
-
-
-    if (threadIdx.x == 0) result[row] = block_sum;
+    if (threadIdx.x == 0) result[row] = block_sum;  // u svaki redak matrice result se zapisuje vrijednost za blok
 }
 
 
-DeviceMatrix DeviceMatrix::matColReduceV2(const DeviceMatrix& A) {
+DeviceMatrix DeviceMatrix::matColSumV2(const DeviceMatrix& A) {
 
     if (A.totalSize() == 0 || A.cols() == 1)
         return A;
@@ -611,6 +611,56 @@ DeviceMatrix DeviceMatrix::matColReduceV2(const DeviceMatrix& A) {
     col_reduce_op << <grid, block, shared_bytes >> > (result.device_matrix, A.device_matrix, A.rows(), A.cols(), A.cols());  // kasnije mozda bude trebalo pitched cols
 
     cudaDeviceSynchronize();
+
+    return result;
+
+}
+
+
+template<int ROWS_PER_TILE = 256>
+__global__
+void row_sum_op(float* result, const float* matrix, size_t rows, size_t cols) {
+
+    size_t col = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (col >= cols)
+        return;
+
+    size_t row_start = blockIdx.y * ROWS_PER_TILE;
+    size_t row_end = min(rows, row_start + ROWS_PER_TILE);
+
+    float acc = 0.0f;
+
+    for (size_t row = row_start; row < row_end; ++row) {
+        acc += matrix[row * cols + col];
+    }
+
+    atomicAdd(&result[col], acc);
+
+}
+
+DeviceMatrix DeviceMatrix::matRowSumV2(const DeviceMatrix& A) {
+
+    int threads = 256;
+    const int rows_per_tile = 256;
+
+    dim3 block(threads, 1, 1);
+    dim3 grid((A.cols() + threads - 1) / threads,
+              (A.rows() + rows_per_tile - 1 ) / rows_per_tile,
+              1);
+
+    DeviceMatrix result(1, A.cols());
+
+
+    cudaError_t err = cudaGetLastError();
+    
+    row_sum_op<rows_per_tile> <<<grid, block >>> (result.device_matrix, A.device_matrix, A.rows(), A.cols());
+    
+    cudaDeviceSynchronize();
+
+    if (err != cudaSuccess) {
+        throw std::runtime_error("in procedure : matRowSumV2 : " + std::string(cudaGetErrorString(err)));
+    }
 
     return result;
 
@@ -637,7 +687,7 @@ __global__ void row_reduce_kernel(float* result, const float* matrix, size_t row
     result[col] = sum;
 }
 
-DeviceMatrix DeviceMatrix::matRowReduce(const DeviceMatrix& A) {
+DeviceMatrix DeviceMatrix::matRowSum(const DeviceMatrix& A) {
     if (A.totalSize() == 0) {
         return A;
     }
@@ -757,7 +807,7 @@ DeviceMatrix DeviceMatrix::Random(size_t rows, size_t cols, std::pair<float, flo
 
     unsigned long seed = static_cast<unsigned long>(time(0));
 
-    random_matrix_kernel << <dimGrid, dimBlock >> > (random_matrix.device_matrix, rows, cols, range.first, range.second, seed);
+    random_matrix_kernel <<<dimGrid, dimBlock >>> (random_matrix.device_matrix, rows, cols, range.first, range.second, seed);
 
     cudaDeviceSynchronize();
 
@@ -992,9 +1042,9 @@ DeviceMatrix DeviceMatrix::MSE(const DeviceMatrix& output, const DeviceMatrix& t
 
     result = DeviceMatrix::matElementWiseMul(result, result);
 
-    result = DeviceMatrix::matRowReduce(result);
+    result = DeviceMatrix::matRowSum(result);
 
-    result = DeviceMatrix::matColReduce(result);
+    result = DeviceMatrix::matColSum(result);
 
     result = DeviceMatrix::matScale(result, 1.0f / (output.rows() * output.cols()));
 
@@ -1126,8 +1176,8 @@ DeviceMatrix DeviceMatrix::BCE(const DeviceMatrix& output, const DeviceMatrix& t
         throw std::runtime_error("BCE kernel error: " + std::string(cudaGetErrorString(err)));
 
  
-    DeviceMatrix row_sum = DeviceMatrix::matRowReduce(bce_values);
-    DeviceMatrix total_sum = DeviceMatrix::matColReduce(row_sum); 
+    DeviceMatrix row_sum = DeviceMatrix::matRowSum(bce_values);
+    DeviceMatrix total_sum = DeviceMatrix::matColSum(row_sum); 
 
 
     float scale = 1.0f / static_cast<float>(output.totalSize());

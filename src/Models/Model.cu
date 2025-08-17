@@ -219,6 +219,7 @@ namespace dl {
             DeviceMatrix output = this->forward();
             
             if (epoch % 2 == 0) {
+               printf("epoch %zu : ", epoch);
 			   this->cost_function->compute(output, target_matrix).downloadToHost().print();
             }
 
@@ -293,7 +294,7 @@ namespace dl {
     }
 
 
-    void Model::evaluate()  {
+    void Model::evaluate(std::shared_ptr<TrainingData> eval_data)  {
 
         if (this->cost_function == nullptr) {
             throw std::runtime_error("Cost function is not set. Please set a cost function before evaluating.");
@@ -301,12 +302,23 @@ namespace dl {
         if (this->learning_units.empty()) {
             return;
         }
-        if (this->training_data == nullptr) {
+
+        std::shared_ptr<TrainingData> data;
+
+        if (eval_data != nullptr) {
+
+            data = eval_data;
+
+        }
+        else if (this->training_data == nullptr) {
             throw std::runtime_error("Training data is not set. Please set training data before evaluating.");
 		}
-
-        std::pair<DeviceMatrix, DeviceMatrix> batch = this->training_data->getSingleBatches();
-
+        else {
+            data = this->training_data;
+        }
+        
+        std::pair <DeviceMatrix, DeviceMatrix> batch = data->getSingleBatches();
+         
 		DeviceMatrix input_matrix = std::move(batch.first);
        
         DeviceMatrix target_matrix = std::move(batch.second);

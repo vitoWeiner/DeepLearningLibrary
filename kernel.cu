@@ -82,27 +82,36 @@ void f() {
 }
 
 
-int main()
+int main3()
 {
 
 	//f();
 	
-	
-	for (int i = 1; i < 0; ++i) {
+	Model model({
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 2)),
+		std::make_shared<Sigmoid>(),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 1)),
+		std::make_shared<Sigmoid>()
+		});
 
+	std::shared_ptr<TrainingData> data = std::make_shared<TrainingData>();
 
-	DeviceMatrix m = DeviceMatrix::Random(100, i);
-
-	DeviceMatrix a = DeviceMatrix::matColReduce(m);
-	DeviceMatrix b = DeviceMatrix::matColReduceV2(m);
-
-	if (a.downloadToHost() != b.downloadToHost()) {
-		printf("everithings wrong");
+	for (float i = 0.0f; i < 0.5f; i += 0.01f) {
+		for (float j = 0.0f; j < 0.5f; j += 0.01f) {
+			data->add({ i, j }, { i + j });
+		}
 	}
 
-	printf("case %d is good\n", i);
-	
-	
+	model.setTrainingData(data);
+	model.setCostFunction(std::make_shared<MSE>());
+
+	model.trainSingleBatchGD(10000, 0.5);
+
+	model.print();
+	model.evaluate();
+
+	return 0;
+
 }
 
 	/*
@@ -140,6 +149,5 @@ int main()
 
 
 
-    return 0;
-}
+
 

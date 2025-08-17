@@ -1,3 +1,6 @@
+
+/*
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -24,7 +27,7 @@ std::vector<float> loadGrayscaleImageAsVector(const std::string& image_path, int
 
     for (int y = 0; y < out_height; ++y) {
         for (int x = 0; x < out_width; ++x) {
-            data.push_back((255 - image.at<uchar>(y, x)) / 255.0f);
+            data.push_back(( image.at<uchar>(y, x)) / 255.0f);
         }
     }
 
@@ -32,7 +35,7 @@ std::vector<float> loadGrayscaleImageAsVector(const std::string& image_path, int
 }
 
 
-int Notmain() {
+int main() {
 
     srand(time(0));
 
@@ -45,7 +48,10 @@ int Notmain() {
     std::vector<float> target_image;
     try {
         target_image = loadGrayscaleImageAsVector(
-            "C:/Users/Vito/Desktop/DesktopApp/DeepLearningLib/eight3.png",
+            
+            "C:/Users/Vito/Desktop/DesktopApp/DeepLearningLib/smile.png",
+            //"C:/Users/Vito/Desktop/DesktopApp/DeepLearningLibrary/10057.png",
+            
             const_cast<int&>(img_width), const_cast<int&>(img_height)
         );
     }
@@ -120,3 +126,5 @@ int Notmain() {
 
     return 0;
 }
+
+*/
