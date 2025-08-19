@@ -146,7 +146,7 @@ for all operations check the header file Matrix.hpp in include directory
 	
 
 
-	// Layer is object that represent one linear layer of MLP, with weights and biases, the constructor is constructing DeviceMatrix weights and biases, on CUDA VRAM heap
+	// Layer is object that represent one linear layer of MLP, with weights and biases, the constructor is constructing DeviceMatrix weights and biases, on CUDA VRAM
 
 	MLP::Layer layer = MLP::Layer::RandomLayer(2, 2, { -1.0f, 1.0f });  // initializing layer with 2 inputs and 10 outputs, with random values from -1 to 1 
     
