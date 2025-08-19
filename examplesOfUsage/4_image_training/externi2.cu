@@ -1,17 +1,25 @@
+
+/*
+This current example (4_training_image) is inspired by the project nn.h (link: https://github.com/tsoding/nn.h) by [Alexey Kutepov].
+*/
+
+
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+
 
 #include <memory>
 #include <vector>
 #include <cstdio>
 
-#include "./include/Matrix.hpp"
-#include "./include/DeviceMatrix.cuh"
-#include "./include/Models/MLP/Layer.cuh"
-#include "./include/Models/Model.cuh"
-#include "./include/Models/Activations/Sigmoid.cuh"
-#include "./include/Models/CostFunctions/MSE.cuh"
-#include "./include/Models/TrainingData/MLP_TrainingData.cuh"
+#include "Matrix.hpp"
+#include "DeviceMatrix.cuh"
+#include "Models/MLP/Layer.cuh"
+#include "Models/Model.cuh"
+#include "Models/Activations/Sigmoid.cuh"
+#include "Models/CostFunctions/MSE.cuh"
+#include "Models/TrainingData/MLP_TrainingData.cuh"
+#include "Models/Activations/ReLU.cuh"
 
 using namespace dl;
 

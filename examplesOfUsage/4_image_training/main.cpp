@@ -1,3 +1,9 @@
+
+
+/*
+source of idea for this example : https://youtu.be/I_3d83cvByY?si=DNVYcFz7Zwei9Lrv
+*/
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -8,7 +14,14 @@
 #include <raymath.h>
 #include <opencv2/opencv.hpp>
 
-// cuda bridge
+
+/*
+
+This current example (4_training_image) is inspired by the project nn.h (link: https://github.com/tsoding/nn.h) by [Alexey Kutepov].
+
+*/
+
+
 extern "C" void initTraining(const float* img1_data, const float* img2_data, int width, int height);
 extern "C" void trainStep();
 extern "C" void getCurrentOutput(float* out_buffer, float flag, int width, int height);
@@ -18,7 +31,7 @@ extern "C" void setOutputSwap(bool swap);
 template<typename T>
 static inline T clampv(T v, T lo, T hi) { return (v < lo) ? lo : (v > hi ? hi : v); }
 
-// loads grayscale, resizes to w x h, returns values in [0,1]
+
 static std::vector<float> loadGrayToVector(const std::string& path, int w, int h) {
     cv::Mat img = cv::imread(path, cv::IMREAD_GRAYSCALE);
     if (img.empty()) throw std::runtime_error("Failed to load image: " + path);
@@ -38,7 +51,7 @@ static std::vector<float> loadGrayToVector(const std::string& path, int w, int h
     return out;
 }
 
-int main() {  // image interpolation program
+int main() {  
     std::srand((unsigned)std::time(nullptr));
 
     const int imgW = 28;
@@ -49,8 +62,8 @@ int main() {  // image interpolation program
 
     std::vector<float> img1, img2;
     try {
-        img1 = loadGrayToVector("C:/Users/Vito/Desktop/DesktopApp/DeepLearningLibrary/house.png", imgW, imgH);
-        img2 = loadGrayToVector("C:/Users/Vito/Desktop/DesktopApp/DeepLearningLibrary/man.png", imgW, imgH);
+        img1 = loadGrayToVector("C:/path/man.png", imgW, imgH);
+        img2 = loadGrayToVector("C:/path/house.png", imgW, imgH);
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << '\n';
@@ -73,7 +86,7 @@ int main() {  // image interpolation program
         }
         Texture2D t = LoadTextureFromImage(im);
         UnloadImage(im);
-        SetTextureFilter(t, TEXTURE_FILTER_BILINEAR); // remove blockiness on scale
+        SetTextureFilter(t, TEXTURE_FILTER_BILINEAR);
         return t;
         };
 
@@ -82,12 +95,12 @@ int main() {  // image interpolation program
 
     std::vector<float> nnOut(imgW * imgH, 0.0f);
 
-    // persistent pixel buffer + texture (no per-frame reallocs)
+  
     std::vector<Color> pixels(imgW * imgH);
     Image outImageHeader = { pixels.data(), imgW, imgH, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 };
     Texture2D outTex = LoadTextureFromImage(outImageHeader);
     SetTextureFilter(outTex, TEXTURE_FILTER_BILINEAR);
-    // do not UnloadImage(outImageHeader); it would try to free pixels.data()
+   
 
     float flag = -1.0f;
     bool mappingSwap = false;
@@ -106,7 +119,7 @@ int main() {  // image interpolation program
         trainStep();
         getCurrentOutput(nnOut.data(), flag, imgW, imgH);
 
-        // fill pixel buffer and update texture
+        
         for (int i = 0; i < imgW * imgH; ++i) {
             float v = clampv(nnOut[i], 0.0f, 1.0f);
             unsigned char g = (unsigned char)(v * 255.0f);
@@ -117,7 +130,7 @@ int main() {  // image interpolation program
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        DrawText(TextFormat("Flag: %.2f (LEFT/RIGHT)  [S] toggle mapping", flag), 10, 10, 20, BLACK);
+        DrawText(TextFormat("Flag: %.2f move with arrows <- ->(LEFT/RIGHT) from -1 to -0.8", flag), 10, 10, 20, BLACK);
 
         DrawTextureEx(texImg1, Vector2{ 0, 40 }, 0.0f, (float)scale, WHITE);
         DrawTextureEx(texImg2, Vector2{ (float)(imgW * scale + 10), 40 }, 0.0f, (float)scale, WHITE);

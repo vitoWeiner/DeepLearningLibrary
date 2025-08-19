@@ -349,10 +349,12 @@ namespace dl {
             printf("\n__________\n");
             printf("\nSample %zu:\n", sample + 1);
             printf("\ninput:\n");
+#if 1
             for (size_t row = 0; row < input_host.rows(); ++row) {
 				printf("%f ", input_host.getAt(row, sample));
             }
-			printf("\noutput:\n");
+#endif
+			printf("\nmodel output:\n");
             for (size_t row = 0; row < output_host.rows(); ++row) {
 				printf("%f ", output_host.getAt(row, sample));
             }

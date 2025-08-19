@@ -99,7 +99,7 @@ namespace dl {
 
 
        static DeviceMatrix BCEGradient(const DeviceMatrix& output, const DeviceMatrix& target);
-       static DeviceMatrix DeviceMatrix::BCE(const DeviceMatrix& output, const DeviceMatrix& target);
+       static DeviceMatrix BCE(const DeviceMatrix& output, const DeviceMatrix& target);
     
         ~DeviceMatrix();
 
