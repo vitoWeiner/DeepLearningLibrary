@@ -142,10 +142,10 @@ namespace dl {
 
 	std::pair<std::vector<DeviceMatrix>, std::vector<DeviceMatrix>> TrainingData::getMiniBatchesShuffled(size_t batch_size) {
 
-		if (this->inputs.empty())  // implies outputs are empty;  
+		if (this->inputs.empty())  
 			throw std::runtime_error("there is no inputs and outputs");
 		
-		size_t dataset_size = this->inputs.size();  // implies outputs.size();
+		size_t dataset_size = this->inputs.size();  
 		size_t input_dim = this->inputs[0].size();   
 		size_t output_dim = this->outputs[0].size();
 
@@ -172,18 +172,18 @@ namespace dl {
 		input_batches.reserve(batches_count);
 		output_batches.reserve(batches_count);
 
-		for (size_t start = 0; start < dataset_size; start += batch_size) {  // start je batch iterator iterira po svim mini-batchevima
+		for (size_t start = 0; start < dataset_size; start += batch_size) {  
 
-			size_t end = std::min(start + batch_size, dataset_size);  // kraj batcha
-			size_t current_batch_size = end - start;  // velicina batcha
+			size_t end = std::min(start + batch_size, dataset_size);  
+			size_t current_batch_size = end - start;  
 
-			Matrix input_batch(input_dim, current_batch_size);  // kreiranje input-mini batcha i output mini batcha
+			Matrix input_batch(input_dim, current_batch_size);  
 			Matrix output_batch(output_dim, current_batch_size);
 
 			for (size_t col = 0; col < current_batch_size; ++col) {
-				size_t idx = indices[start + col];  // idx iterira kroz sve sampleove mini-batcha na kojeg pointa start
+				size_t idx = indices[start + col]; 
 
-				for (size_t row = 0; row < input_dim; ++row) {  // iteriranje kroz sve elemente svakog input -samplea
+				for (size_t row = 0; row < input_dim; ++row) {  
 					input_batch.setAt(this->inputs[idx][row], row, col);
 				}
 

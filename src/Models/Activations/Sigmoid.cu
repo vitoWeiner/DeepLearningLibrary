@@ -3,8 +3,6 @@
 
 namespace dl {
 
-	//Sigmoid::Sigmoid() : input(), output() {}
-
 	Sigmoid::Sigmoid() {}
 
 	DeviceMatrix Sigmoid::forward() {
@@ -52,12 +50,5 @@ namespace dl {
 
 
 	}
-	
-
-	//Sigmoid::Sigmoid(DeviceMatrix& input_matrix) : input(input_matrix) {}
-
-	//Sigmoid::Sigmoid(DeviceMatrix&& input_matrix) : input(std::move(input_matrix)) {}
-
-
 
 };

@@ -73,7 +73,7 @@ Matrix::Matrix(size_t rows, size_t cols) : rows_count(rows), cols_count(cols) {
     this->matrix = nullptr;
 
     if (this->total_size != 0) {
-        matrix = new float[this->total_size](); // Initialize all elements to 0
+        matrix = new float[this->total_size](); 
     }
 
 }
@@ -595,11 +595,7 @@ Matrix Matrix::Random(size_t rows, size_t cols, std::pair<float, float> range) {
         }
     }
 
-    /*
-    bacit oko na:
-    for (size_t i = 0; i < rows; ++i) {
-        random.setAt(static_cast<float>(rand()) / static_cast<float>(RAND_MAX), i / cols, i % cols);
-    }*/
+    
 
     return random;
 }

@@ -10,25 +10,19 @@
 namespace dl {
 
 
-    long long DeviceMatrix::instances = 0;
-    long long DeviceMatrix::ID = 0;
-
-    std::unordered_set<long long> DeviceMatrix::ids;
-
-
     DeviceMatrix::DeviceMatrix() :
-        device_matrix(nullptr), rows_count(0), cols_count(0), total_size(0), id(-10) {
-        //DeviceMatrix::increment();
+        device_matrix(nullptr), rows_count(0), cols_count(0), total_size(0) {
+      
     }
 
     DeviceMatrix::DeviceMatrix(const DeviceMatrix& other) :
-        device_matrix(nullptr), rows_count(other.rows_count), cols_count(other.cols_count), total_size(other.total_size), id(-20) {
+        device_matrix(nullptr), rows_count(other.rows_count), cols_count(other.cols_count), total_size(other.total_size) {
 
         if (other.device_matrix == nullptr) {
             return;
         }
 
-        // else if (other.device_matrix is not null )
+       
 
         cudaError_t cuda_malloc_error = cudaMalloc(&device_matrix, this->total_size * sizeof(float));
 
@@ -44,7 +38,7 @@ namespace dl {
             throw std::runtime_error("DeviceMatrix copy constructor error:\n cudaMemcpy failed: " + std::string(cudaGetErrorString(cuda_memcpy_error)));
         }
 
-        DeviceMatrix::increment(this);
+     
     }
 
     DeviceMatrix& DeviceMatrix::operator=(const DeviceMatrix& other)
@@ -56,11 +50,11 @@ namespace dl {
         if (this->device_matrix) {
             cudaError_t err = cudaFree(this->device_matrix);
             if (err != cudaSuccess) {
-                //throw std::runtime_error("DeviceMatrix assignment error: cudaFree failed: " + std::string(cudaGetErrorString(err)));
+                
                 printf("[DeviceMatrix] Warning: cudaFree failed in assignment: %s\n", cudaGetErrorString(err));
             }
             this->device_matrix = nullptr;
-            DeviceMatrix::decrement(this->id);
+           
         }
 
         this->rows_count = other.rows_count;
@@ -72,7 +66,7 @@ namespace dl {
             return *this;
         }
 
-        // else if ( other.device_matrix is not null )
+       
 
         cudaError_t cuda_malloc_error = cudaMalloc(&this->device_matrix, this->total_size * sizeof(float));
 
@@ -87,7 +81,7 @@ namespace dl {
             throw std::runtime_error("DeviceMatrix assignment error:\n cudaMemcpy failed: " + std::string(cudaGetErrorString(cuda_memcpy_error)));
         }
 
-        DeviceMatrix::increment(this);
+       
 
         return *this;
     }
@@ -101,7 +95,7 @@ namespace dl {
             return;
         }
 
-        // else if (temp_arr is not null )
+       
 
         cudaError_t cuda_malloc_error = cudaMalloc(&device_matrix, this->total_size * sizeof(float));
 
@@ -117,7 +111,7 @@ namespace dl {
             throw std::runtime_error("error in CUDA_Matrix.uploadFromMatrix(Matrix M): problem:\n cudaMemcpy failed:\n" + std::string(cudaGetErrorString(cuda_memcpy_error)));
         }
 
-        DeviceMatrix::increment(this);
+      
     }
 
     DeviceMatrix::DeviceMatrix(std::initializer_list<float> args, size_t rows, size_t cols) :
@@ -132,7 +126,7 @@ namespace dl {
             return;
         }
 
-        // else if (this->total_size is not 0)
+     
 
         float* temp_arr = new float[this->total_size];
 
@@ -154,7 +148,7 @@ namespace dl {
             throw std::runtime_error("DeviceMatrix constructor error:\n cudaMemcpy failed: " + std::string(cudaGetErrorString(cuda_memcpy_error)));
         }
 
-        DeviceMatrix::increment(this);
+       
     }
 
 
@@ -167,7 +161,7 @@ namespace dl {
             return;
         }
 
-        // else if (this->total_size is not 0)
+       
 
         cudaError_t cuda_malloc_error = cudaMalloc(&this->device_matrix, this->total_size * sizeof(float));
 
@@ -182,20 +176,19 @@ namespace dl {
             throw std::runtime_error("DeviceMatrix constructor error:\n cudaMemset failed: " + std::string(cudaGetErrorString(cuda_memset_error)));
         }
 
-        DeviceMatrix::increment(this);
+       
     }
 
-    //#include <iostream>
+    
 
     DeviceMatrix::DeviceMatrix(DeviceMatrix&& other) noexcept
         : device_matrix(other.device_matrix),
         rows_count(other.rows_count),
         cols_count(other.cols_count),
-        total_size(other.total_size),
-        id(other.id)  // Move the id as well
+        total_size(other.total_size)  
     {
 
-        //std::cout << "[Move ctor]" << std::endl;
+      
         other.device_matrix = nullptr;
         other.rows_count = 0;
         other.cols_count = 0;
@@ -204,9 +197,9 @@ namespace dl {
 
 
 
-    DeviceMatrix& DeviceMatrix::operator=(DeviceMatrix&& other) noexcept { // error handlinga nemna nego log
+    DeviceMatrix& DeviceMatrix::operator=(DeviceMatrix&& other) noexcept { 
 
-        //std::cout << "[Move assignment operator]" << std::endl;
+       
 
         if (this == &other) {
             return *this;
@@ -214,11 +207,10 @@ namespace dl {
 
         if (this->device_matrix) {
             cudaError_t err = cudaFree(this->device_matrix);
-            DeviceMatrix::decrement(this->id);
+           
 
             if (err != cudaSuccess) {
-                //std::cerr << "[DeviceMatrix] Warning: cudaFree failed in move assignment: "
-                          // << cudaGetErrorString(err) << std::endl;
+                
             }
         }
 
@@ -226,7 +218,7 @@ namespace dl {
         this->rows_count = other.rows_count;
         this->cols_count = other.cols_count;
         this->total_size = other.total_size;
-        this->id = other.id;  // Move the id as well
+       
 
         other.device_matrix = nullptr;
         other.rows_count = 0;
@@ -256,10 +248,10 @@ namespace dl {
     }
 
 
-    Matrix DeviceMatrix::downloadToHost() const {  // moram dodat error handling
+    Matrix DeviceMatrix::downloadToHost() const { 
 
         if (this->device_matrix == nullptr) {
-            return Matrix(0, 0); // Return an empty Matrix if device_matrix is null 
+            return Matrix(0, 0); 
         }
 
         float* host_data = new float[total_size];
@@ -335,7 +327,7 @@ namespace dl {
 void DeviceMatrix::downloadToHost(float* buffer) const {  // moram dodat error handling
 
     if (this->device_matrix == nullptr) {
-        return; // Return an empty Matrix if device_matrix is null 
+        return;
     }
 
 
@@ -363,7 +355,7 @@ void DeviceMatrix::clean() noexcept {
         this->rows_count = 0;
         this->cols_count = 0;
         this->total_size = 0;
-	    DeviceMatrix::decrement(this->id);
+	   
     }
 
 }
@@ -371,7 +363,7 @@ void DeviceMatrix::clean() noexcept {
 DeviceMatrix::~DeviceMatrix() {
     if (device_matrix != nullptr) {
         cudaFree(device_matrix);
-//		DeviceMatrix::decrement(this->id);
+
     }
 }
 

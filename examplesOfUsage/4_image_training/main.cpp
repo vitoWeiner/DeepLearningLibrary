@@ -1,8 +1,6 @@
 
 
-/*
-source of idea for this example : https://youtu.be/I_3d83cvByY?si=DNVYcFz7Zwei9Lrv
-*/
+
 
 #include <iostream>
 #include <vector>
@@ -14,12 +12,6 @@ source of idea for this example : https://youtu.be/I_3d83cvByY?si=DNVYcFz7Zwei9L
 #include <raymath.h>
 #include <opencv2/opencv.hpp>
 
-
-/*
-
-This current example (4_training_image) is inspired by the project nn.h (link: https://github.com/tsoding/nn.h) by [Alexey Kutepov].
-
-*/
 
 
 extern "C" void initTraining(const float* img1_data, const float* img2_data, int width, int height);
@@ -72,7 +64,7 @@ int main_4() {
 
     initTraining(img1.data(), img2.data(), imgW, imgH);
 
-    InitWindow(winW, winH, "Training Visualization with Flag");
+    InitWindow(winW, winH, "Training Visualization");
     SetTargetFPS(30);
 
     auto texFromFloatVector = [&](const std::vector<float>& v) -> Texture2D {
@@ -130,7 +122,7 @@ int main_4() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        DrawText(TextFormat("Flag: %.2f move with arrows <- ->(LEFT/RIGHT) from -1 to -0.8", flag), 10, 10, 20, BLACK);
+        DrawText(TextFormat("%.2f move with arrows <- ->(LEFT/RIGHT) from -1 to -0.8", flag), 10, 10, 20, BLACK);
 
         DrawTextureEx(texImg1, Vector2{ 0, 40 }, 0.0f, (float)scale, WHITE);
         DrawTextureEx(texImg2, Vector2{ (float)(imgW * scale + 10), 40 }, 0.0f, (float)scale, WHITE);

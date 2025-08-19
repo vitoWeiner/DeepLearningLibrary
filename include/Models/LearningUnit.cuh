@@ -13,10 +13,10 @@ namespace dl {
 
 /*
 		
-Grammar for LearningUnit:
+Composition tree for LearningUnit:
 
 LearningUnit ::= Model | Layer | ActivationFunction | LossFunction
-Model ::= LearningUnit+
+Model ::= LearningUnit*
 
 
 */
@@ -34,7 +34,7 @@ Model ::= LearningUnit+
 		LearningUnit(LearningUnit&& other) noexcept = default;
 		LearningUnit& operator=(LearningUnit&& other) noexcept = default;
 
-//		LearningUnit(const LearningUnit& other) : input(other.input) {}
+
 		
 
 		virtual void setInput(const DeviceMatrix& input_matrix) {
@@ -49,9 +49,9 @@ Model ::= LearningUnit+
 
 		virtual void setInput(DeviceMatrix&& input_matrix) {
 
-			/*if (input_matrix.totalSize() == 0) {
+			if (input_matrix.totalSize() == 0) {
 				throw std::runtime_error("Input matrix cannot be empty.");
-			}*/
+			}
 
 
 			this->input = std::move(input_matrix);

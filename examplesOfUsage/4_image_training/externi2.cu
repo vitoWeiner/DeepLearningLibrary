@@ -1,4 +1,7 @@
 
+
+
+
 /*
 This current example (4_training_image) is inspired by the project nn.h (link: https://github.com/tsoding/nn.h) by [Alexey Kutepov].
 */
@@ -31,7 +34,7 @@ static bool g_swapXY = false;
 extern "C" void setOutputSwap(bool swap) { g_swapXY = swap; }
 
 extern "C" void initTraining(float* img1_data, float* img2_data, int width, int height) {
-    // model: input 3 -> hidden 64 -> 64 -> 28 -> 1 with sigmoid
+  
     mlp = std::make_shared<Model>(Model({
         std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(3, 64,  {-8, 8})),
         std::make_shared<Sigmoid>(),
@@ -84,7 +87,7 @@ extern "C" void getCurrentOutput(float* out_buffer, float flag, int width, int h
             float nx = (static_cast<float>(x) / (width - 1)) * 2.0f - 1.0f;
             float ny = (static_cast<float>(y) / (height - 1)) * 2.0f - 1.0f;
 
-            // row-major 3xN: first all flags, then all nx, then all ny
+         
             input_vec[i] = flag;
             input_vec[N + i] = nx;
             input_vec[2 * N + i] = ny;

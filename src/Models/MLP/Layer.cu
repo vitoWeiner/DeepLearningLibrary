@@ -19,12 +19,9 @@ namespace dl {
         
         	this->weights = Weights;
         	this->biases = Biases;
-        	//this->input_size = Weights.cols();
-        	//this->output_size = Weights.rows();
+        	
         
         }
-        
-        
         
         Layer::Layer(DeviceMatrix&& Weights, DeviceMatrix&& Biases) {
         
@@ -33,30 +30,8 @@ namespace dl {
         
         	this->weights = std::move(Weights);
         	this->biases = std::move(Biases);
-        	//this->input_size = this->weights.cols();
-        	//this->output_size = this->weights.rows();
+        	
         }
-        
-        /*Layer::Layer(const Layer& layer) :
-        	weights(layer.weights),
-        	biases(layer.biases),
-        	input(layer.input)
-            {}*/
-        	//input_size(layer.input_size),
-        	//output_size(layer.output_size) 
-        
-        
-        
-        /*Layer& Layer::operator=(const Layer& layer) {
-        	if (this == &layer) {
-        		return *this;
-        	}
-        	this->weights = layer.weights;
-        	this->biases = layer.biases;
-        	//this->input_size = layer.input_size;
-        	//this->output_size = layer.output_size;
-        	return *this;
-        }*/
         
         
         void Layer::setInput(const DeviceMatrix& input_matrix) {
@@ -73,33 +48,6 @@ namespace dl {
         
         	this->input = std::move(input_matrix);
         }
-        
-        
-        /*Layer::Layer(Layer&& layer) noexcept :
-        	weights(std::move(layer.weights)),
-        	biases(std::move(layer.biases)),
-        	input(std::move(layer.input))
-        {
-        	//layer.input_size = 0;
-        	//layer.output_size = 0;
-        }*/
-        	//input_size(layer.input_size),
-        	//output_size(layer.output_size) 
-        
-        
-       /* Layer& Layer::operator=(Layer&& layer) noexcept {
-        	if (this == &layer) {
-        		return *this;
-        	}
-        	this->weights = std::move(layer.weights);
-        	this->biases = std::move(layer.biases);
-        	this->input = std::move(layer.input);
-        	//this->input_size = layer.input_size;
-        	//this->output_size = layer.output_size;
-        	//layer.input_size = 0;
-        	//layer.output_size = 0;
-        	return *this;
-        }*/
         
         
         DeviceMatrix Layer::forward() {
@@ -135,8 +83,8 @@ namespace dl {
         	DeviceMatrix gradient_input = this->backpropagate(gradient_output);
         
         	// scaling gradients
-            gradient_weights = DeviceMatrix::matScale(gradient_weights, learning_rate); // / batch_size);
-            gradient_biases = DeviceMatrix::matScale(gradient_biases, learning_rate); // / batch_size);
+            gradient_weights = DeviceMatrix::matScale(gradient_weights, learning_rate); 
+            gradient_biases = DeviceMatrix::matScale(gradient_biases, learning_rate); 
         
         	// training step
         	weights = DeviceMatrix::matSub(weights, gradient_weights);

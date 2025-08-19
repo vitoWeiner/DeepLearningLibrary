@@ -18,7 +18,7 @@ namespace dl {
 		std::vector<std::shared_ptr<LearningUnit>> learning_units;
         std::shared_ptr<CostFunction> cost_function;
         std::shared_ptr<TrainingData> training_data;
-        // mora bit unique jer ako je shared_ptr onda bi znacilo da vise modela moze djeliti isti dio, sto nema smisla, svaki model je izgraden od unikatnih djelova
+        
 
     public:
 
@@ -34,23 +34,8 @@ namespace dl {
 
         Model(const std::vector<std::shared_ptr<LearningUnit>>& layers);
 
-   
-
-
-        // ovo moram dalje
-      /*  Model(std::initializer_list<std::shared_ptr<LearningUnit>> layers) {
-            
-            for (const auto& layer : layers) {
-                if (!layer) {
-                    throw std::runtime_error("Cannot bind a null LearningUnit.");
-                }
-                learning_units.push_back(layer);
-			}
-        }*/
-
-
         void setCostFunction(std::shared_ptr<CostFunction> cost_function);
-        void setTrainingData(std::shared_ptr<TrainingData> training_data);  // zasad ne treba polimorfizam, pa je u redu ovako
+        void setTrainingData(std::shared_ptr<TrainingData> training_data);  
 
         size_t depth() const;
 

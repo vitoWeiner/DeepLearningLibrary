@@ -125,7 +125,10 @@ for all operations check the header file Matrix.hpp in include directory
 	
 	DeviceMatrix t_d = DeviceMatrix::matTranspose(exmpl2);  // kernel for transposing
 
-	/**********************
+	
+	
+	
+	/*********************
 	
 	all method signatures are in the header file DeviceMatrix.cuh, all kernel definitions are in DeviceMatrixOps.cu
 	

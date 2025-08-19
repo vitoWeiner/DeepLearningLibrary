@@ -1,17 +1,6 @@
 // file: DeviceMatrixOps.cu, ovdje se nalaze metode za rad s DeviceMatrix preko devicea (kerneli)
 
 
-/*
-
-POZOR:
-
-NEKI KERNELI NISU JOS OPTIMIZIRANI NEGO TRIVIJALNO IMPLEMENTIRANI, SEMANTICKI ISPRAVNI, RADE ISPRAVNO, ALI POTPUNA OPTIMIZACIJA JOS NIJE IZVEDENA.
-NPR:
-- reduction sum radi ali treba dodati umjesto trivijalnog algoritma, algoritam redukcije putem stabla redukcije, a ne trivijalno zbrajanje svakog retka.
-- matmul je dosta optimiziran, radi ispravno, no postoje izvori sporosti poput bank konflikata, to jos treba rjesiti, neki problemi s bank konfliktima i mozda dodati jos koje optimizacije.
-- banchmarking i optimiziranje velicine blokova i grida treba isto, trenutno su simbolicni 2x2, u praksi je cesto 16x16, ali treba testirati na uredaju i vidjeti sto je najoptimalnije.
-
-*/
 
 
 #include "./../include/DeviceMatrix.cuh"
@@ -523,7 +512,7 @@ DeviceMatrix DeviceMatrix::matColSum(const DeviceMatrix& A) {
         return A;
     }
 
-    DeviceMatrix result(A.rows(), 1); // rezultat je vektor sa zbrojem svakog retka
+    DeviceMatrix result(A.rows(), 1); 
 
     dim3 dimBlock(TILE_WIDTH, TILE_HEIGHT);
     dim3 dimGrid((result.cols() + TILE_WIDTH - 1) / TILE_WIDTH, (result.rows() + TILE_HEIGHT - 1) / TILE_HEIGHT);
@@ -557,7 +546,7 @@ float warp_reduce_sum(float val) {  // binary halving reduction
 }
 
 __global__
-void col_reduce_op(float* result, const float* matrix, size_t rows, size_t cols, size_t pitch_cols) {
+void col_reduce_op(float* result, const float* matrix, size_t rows, size_t cols) {
 
     size_t row = blockIdx.y;
     if (row >= rows) return;
@@ -567,7 +556,7 @@ void col_reduce_op(float* result, const float* matrix, size_t rows, size_t cols,
 
     float local = 0.0f;
     for (size_t col = threadIdx.x; col < cols; col += blockDim.x) {   // matrica moze imati vise stupaca nego je alociranih threadova, threadovi coalesced iteriraju po svim segmentima u periodu velicine blockDim.x
-        size_t idx = row * pitch_cols + col;
+        size_t idx = row * cols + col;
         local += matrix[idx];  
     } // u ovom trenutku svi threadovi u warpu imaju svoju vrijednost u registru local
 
@@ -608,7 +597,7 @@ DeviceMatrix DeviceMatrix::matColSumV2(const DeviceMatrix& A) {
     dim3 grid(1, A.rows(), 1);
     size_t shared_bytes = sizeof(float) * ((threads + 31) / 32);  // == broj warpova u bloku * sizeof(float); // ako ce se staticki alocirati onda najbolje 32 warpa jer (blockDim.x <= 1024 --> warps count <= 32) ali ovako je bolje dinamicki alocirati da ne bude bezveze previse shared memory alocirano
 
-    col_reduce_op << <grid, block, shared_bytes >> > (result.device_matrix, A.device_matrix, A.rows(), A.cols(), A.cols());  // kasnije mozda bude trebalo pitched cols
+    col_reduce_op << <grid, block, shared_bytes >> > (result.device_matrix, A.device_matrix, A.rows(), A.cols());  
 
     cudaDeviceSynchronize();
 
@@ -669,7 +658,7 @@ DeviceMatrix DeviceMatrix::matRowSumV2(const DeviceMatrix& A) {
 
 
 
-// OPREZ OVO JE TRIVIJALNA IMPLEMENTACIJA, TREBA REIMPLEMENTIRATI S PAMETNIJIM ALGORITMOM KOJI KORISTI COALESCED MEM ACCESS ZA UBRZANJE
+
 
 __global__ void row_reduce_kernel(float* result, const float* matrix, size_t rows, size_t cols) {
 
@@ -1029,12 +1018,12 @@ DeviceMatrix DeviceMatrix::SigmoidGradient(const DeviceMatrix& sigmoid_output) {
     return output;
 }
 
-// mora se implementirati jos
+
 
 
 __global__ void MSE_kernel(float* output, const float* target, size_t rows, size_t cols) {}
 
-// POZOR, MSE TRENUTNO U TRIVIJALNOJ IMPLEMENTACIJI, SEMANTICKI ISPRAVAN, ALI NIKAKO OPTIMALAN PO PITANJU VREMENA
+
 
 DeviceMatrix DeviceMatrix::MSE(const DeviceMatrix& output, const DeviceMatrix& target) {
 
@@ -1064,7 +1053,7 @@ __global__ void MSE_gradient_kernel(float* gradient, const float* output, const 
     gradient[idx] = 2.0f * (output[idx] - target[idx]) / (rows * cols);
 }
 
-// TRIVIJALNA IMPLEMENTACIJA, SEMANTICKI ISPRAVAN, ALI NIKAKO OPTIMALAN PO PITANJU VREMENA
+
 
 DeviceMatrix DeviceMatrix::MSEGradient(const DeviceMatrix& output, const DeviceMatrix& target) {
 
@@ -1105,7 +1094,7 @@ __global__ void BCE_gradient_kernel(float* gradient, const float* output, const 
     float y_hat = output[idx];
     float y = target[idx];
 
-    // epsilon da izbjegnemo log(0) i dijeljenje s 0
+    
     const float eps = 1e-8f;
     gradient[idx] = (y_hat - y) / (max(y_hat * (1.0f - y_hat), eps));
 }
@@ -1142,7 +1131,7 @@ __global__ void BCE_kernel(const float* output, const float* target, float* resu
     if (row >= rows || col >= cols) return;
 
     int idx = row * cols + col;
-    const float eps = 1e-8f; // stabilnost loga
+    const float eps = 1e-8f; 
     float y_hat = output[idx];
     float y = target[idx];
 

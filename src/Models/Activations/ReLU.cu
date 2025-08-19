@@ -33,10 +33,6 @@ namespace dl {
 
 	DeviceMatrix ReLU::backpropagate(DeviceMatrix gradient_output) {
 
-		/*if (this->input.totalSize() == 0) {
-			throw std::runtime_error("Input matrix is empty");
-		}*/
-
 		if (this->output.totalSize() == 0) {
 			this->output = this->forward();
 		}

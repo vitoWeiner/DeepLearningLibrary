@@ -12,7 +12,7 @@
 namespace dl {
 
 
-    // Model::copy constructor
+    
 	Model::Model(const Model& other) {
 		for (const auto& unit : other.learning_units) {
 			learning_units.push_back(unit->clone());
@@ -22,7 +22,7 @@ namespace dl {
     Model& Model::operator=(const Model& other) {
         
         if (this == &other) {
-            return *this; // self-assignment check
+            return *this; 
         }
         
         this->clean();
@@ -35,15 +35,6 @@ namespace dl {
 
 
     }
-
-
-/*   Model::Model(Model&& other) noexcept {
-    
-		learning_units = std::move(other.learning_units);
-
-        other.clean();
-    
-    } */
 
     Model::Model(std::initializer_list<std::shared_ptr<LearningUnit>> layers) : Model(std::vector<std::shared_ptr<LearningUnit>>(layers)) {}
 
@@ -147,7 +138,7 @@ namespace dl {
 			output = unit->forward();
             
             if (!unit->backpropNeedsInput()) {
-                unit->setInput(Matrix());  // create empty input (with nullptr)
+                unit->setInput(DeviceMatrix());  
             }
 		}
 
