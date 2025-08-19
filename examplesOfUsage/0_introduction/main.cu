@@ -99,7 +99,7 @@ for all operations check the header file Matrix.hpp in include directory
 
 
 
-   // DeviceMatrix is object on CUDA GPU, all operations are on GPU for this object, constructor is alocating heap memory on CUDA VRAM
+   // DeviceMatrix is object on CUDA GPU, all operations are on GPU for this object, constructor is alocating memory on CUDA VRAM
 
 	DeviceMatrix x_d = DeviceMatrix(x);  // constructing object DeviceMatrix on gpu based on CPU matrix, this is pure construction, there is no side effects onto cpu matrix (matrix is just deep copied on VRAM)
 	DeviceMatrix y_d = DeviceMatrix(y);
