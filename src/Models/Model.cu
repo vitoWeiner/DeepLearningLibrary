@@ -332,7 +332,7 @@ namespace dl {
 
 		Matrix input_host = input_matrix.downloadToHost();
 		Matrix output_host = output.downloadToHost();
-        Matrix target_host = this->training_data->getOutputSamples().downloadToHost();
+        Matrix target_host = data->getOutputSamples().downloadToHost();
 
         if (input_host.cols() != output_host.cols()) {
 			throw std::runtime_error("Input and output matrices must have the same number of samples. Something is wrong!!!");

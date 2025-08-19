@@ -82,6 +82,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="examplesOfUsage\0_introduction\main.cu" />
     <CudaCompile Include="examplesOfUsage\1_and_xor_problem\main.cu" />
     <CudaCompile Include="examplesOfUsage\2_adding_values_problem\main.cu" />
     <CudaCompile Include="examplesOfUsage\4_image_training\externi2.cu" />

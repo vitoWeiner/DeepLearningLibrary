@@ -105,7 +105,7 @@ static std::vector<float> loadGrayToVector(const std::string& path, int w, int h
 }
 
 
-int main2(void) {
+int main_3(void) {
 
 
     int w = 28;

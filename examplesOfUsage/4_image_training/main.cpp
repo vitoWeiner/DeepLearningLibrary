@@ -51,7 +51,7 @@ static std::vector<float> loadGrayToVector(const std::string& path, int w, int h
     return out;
 }
 
-int main() {  
+int main_4() {  
     std::srand((unsigned)std::time(nullptr));
 
     const int imgW = 28;

@@ -17,7 +17,7 @@ using namespace dl;
 int main_1() {
 
 	Model AND_model({
-		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 2)),
+		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 2)),   
 		std::make_shared<Sigmoid>(),
 		std::make_shared<MLP::Layer>(MLP::Layer::RandomLayer(2, 1)),
 		std::make_shared<Sigmoid>()
