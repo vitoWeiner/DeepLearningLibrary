@@ -51,6 +51,10 @@ int main() {
 
 	z.clean(); // dealocating resorces, setting size to zero, rows to zero, cols to zero
 
+	x.setAt(3.05f, 0, 1);  // set value 3.05 on row 0 and col 1
+
+	x.getAt(0, 1); // get value from row 0 and col 1
+
 
 	// mat operation:
 
